@@ -52,6 +52,14 @@ const Post = ({ jobPosting, width }) => {
           </div>
         </div>
       )}
+      {isPopupOpen && ( // Render popup if isPopupOpen is true
+        <div className="popup">
+          {/* Popup content */}
+          <div className="popup-container">
+            <button className="close-button" onClick={handlePostClick}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
