@@ -74,8 +74,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 25px;  /* or whatever fits your design */
-  height: 25px; /* or whatever fits your design */
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   transition: background-color 0.3s, opacity 0.3s;
   opacity: 0.5;
