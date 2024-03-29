@@ -1,0 +1,9 @@
+.home {
+  width: 100vw;
+  height: 100vh;
+  font-family: "Anton", sans-serif;
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  background-color: #060b26;
+}
