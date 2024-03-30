@@ -12,7 +12,7 @@ const Navbar = () => {
         </div>
       </Link>
       <div className="navbar-right mr-4">
-        <button className="login-button px-6 py-1 text-2xl border border-ssblue rounded-full text-white hover:bg-ssblue hover:text-blue-900 transition duration-300">Login</button>
+        <button className="login-button px-6 py-1 text-2xl border border-ssblue rounded-full text-white hover:bg-ssblue hover:text-blue-900 transition duration-300">Connect</button>
       </div>
     </div>
   );

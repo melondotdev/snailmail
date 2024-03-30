@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Tooltip } from 'react-tooltip'
 import SuiSymbol from "../assets/sui-symbol.png";
 import * as FaIcons from "react-icons/fa";
 import * as MdIcons from "react-icons/md";
@@ -9,6 +10,15 @@ const Post = ({ jobPosting, width }) => {
   const [isReported, setIsReported] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
   const [reportMessageOpacity, setReportMessageOpacity] = useState(1);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    discordUsername: '',
+    twitterProfile: '',
+    portfolioLink: '',
+    aboutYourself: '',
+    qualification: ''
+  });
   const imageURL = jobPosting.imageURL;
 
   const handleMouseEnter = () => {
@@ -28,6 +38,12 @@ const Post = ({ jobPosting, width }) => {
   const handleApplyClick = () => {
     setIsApplied(!isApplied);
   };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({ ...prevState, [name]: value }));
+  };
+  
   
   const handleReportClick = () => {
     setIsReported(true);
@@ -99,27 +115,33 @@ const Post = ({ jobPosting, width }) => {
                 <div className="post-tag rounded-3xl px-2 bg-lightgrey text-base text-faded">{jobPosting.category}</div>
               </div>
             </div>
-            <div className="company-info mt-2 mx-4 text-base font-inter flex items-center">
-              {jobPosting.company} • ☆ {jobPosting.companyRating.toFixed(1)} 
-              <span className="rating-number opacity-50 ml-1">{` (${jobPosting.companyNumberofRatings})`}</span>
-              <a
-                href={`mailto:${jobPosting.email}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="email-link ml-2"
-              ><MdIcons.MdEmail /></a>
-              <a
-                href={jobPosting.discordLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="discord-link ml-2"
-              ><FaIcons.FaDiscord /></a>
-              <a
-                href={jobPosting.twitterLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="twitter-link ml-2"
-              ><FaIcons.FaTwitter /></a>
+            <div className="info-container flex justify-between">
+              <div className="company-info mt-2 mx-4 text-base font-inter flex items-center">
+                {jobPosting.company} • ☆ {jobPosting.companyRating.toFixed(1)} 
+                <span className="rating-number opacity-50 ml-1" data-tooltip-id="ratings-tooltip" data-tooltip-content="Reviews">{` (${jobPosting.companyNumberofRatings})`}</span>
+                <Tooltip id="ratings-tooltip" />
+                <a
+                  href={`mailto:${jobPosting.email}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="email-link ml-2"
+                ><MdIcons.MdEmail /></a>
+                <a
+                  href={jobPosting.discordLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="discord-link ml-2"
+                ><FaIcons.FaDiscord /></a>
+                <a
+                  href={jobPosting.twitterLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="twitter-link ml-2"
+                ><FaIcons.FaTwitter /></a>
+              </div>
+              <div className="post-date-container flex items-end mr-6 opacity-80">
+                <FaIcons.FaRegCalendarAlt /><span className="posting-date ml-1 text-sm font-inter">{jobPosting.datePosted}</span>
+              </div>
             </div>
             <hr className="line opacity-20 w-11/12 mt-2 mx-4" />
             {(isApplied === false) ? (
@@ -143,18 +165,74 @@ const Post = ({ jobPosting, width }) => {
               </div>
             ) : (
               <div className="description-action-container h-4/5">
-                <div className="post-description-container relative mt-4 mx-4 h-full overflow-y-auto">
-                  <h1 className="post-description-title font-inter text-lg font-bold">Application Form</h1>
-                </div>
-                <div className="post-actions flex justify-center items-center mt-1">
-                  <button className="apply flex items-center font-inter text-base m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300" onClick={handleApplyClick}><FaIcons.FaCheck /><span className="ml-1">Back</span></button>
-                  <button className="report flex items-center font-inter text-base m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300"><FaIcons.FaFlag /><span className="ml-1">Submit</span></button>
+                <div className="post-description-container relative mt-4 mx-4 h-full">
+                  <h1 className="post-description-title font-inter text-lg font-bold mb-2">Application Form</h1>
+                  <form className="form-container flex flex-col text-black font-inter">
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Name"
+                      className="form-input"
+                    />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Email"
+                      className="form-input"
+                    />
+                    <input
+                      type="text"
+                      name="discordUsername"
+                      value={formData.discordUsername}
+                      onChange={handleInputChange}
+                      placeholder="Discord Username"
+                      className="form-input"
+                    />
+                    <input
+                      type="text"
+                      name="twitterProfile"
+                      value={formData.twitterProfile}
+                      onChange={handleInputChange}
+                      placeholder="Twitter Profile"
+                      className="form-input"
+                    />
+                    <input
+                      type="text"
+                      name="portfolioLink"
+                      value={formData.portfolioLink}
+                      onChange={handleInputChange}
+                      placeholder="Link to Portfolio"
+                      className="form-input"
+                    />
+                    <textarea
+                      name="aboutYourself"
+                      value={formData.aboutYourself}
+                      onChange={handleInputChange}
+                      placeholder="Tell me about yourself"
+                      className="form-textarea"
+                    ></textarea>
+                    <textarea
+                      name="qualification"
+                      value={formData.qualification}
+                      onChange={handleInputChange}
+                      placeholder="Why are you qualified for this role?"
+                      className="form-textarea"
+                    ></textarea>
+                    <div className="post-actions flex justify-center items-center mt-1">
+                      <button type="button" className="apply flex items-center font-inter text-base text-white m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300" onClick={handleApplyClick}><MdIcons.MdArrowBack /><span className="ml-1">Back</span></button>
+                      <button type="submit" className="report flex items-center font-inter text-base text-white m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300"><FaIcons.FaCheck /><span className="ml-1">Submit</span></button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}
             {isReported && (
               <div 
-                className={`report-response absolute z-20 top-0 left-0 w-full h-full flex items-center justify-center bg-opacity-50 bg-black text-white`} 
+                className={`report-response fixed z-20 top-0 left-0 w-full h-full flex items-center justify-center bg-opacity-80 bg-black text-white`} 
                 style={{opacity: reportMessageOpacity, transition: 'opacity 3s ease-in-out'}}>
                 Thank you for submitting a report!
               </div>

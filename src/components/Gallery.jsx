@@ -22,8 +22,8 @@ const Gallery = () => {
   const numItemsFitMaxWidth = Math.floor(windowWidth / 250);
   const dynamicItemWidth =
     windowWidth / numItemsFitMaxWidth > 251
-      ? windowWidth / (numItemsFitMaxWidth + 1) + 10
-      : windowWidth / numItemsFitMaxWidth + 10;
+      ? windowWidth / (numItemsFitMaxWidth + 1) - 5
+      : windowWidth / numItemsFitMaxWidth - 5;
   
   const jobPostings = [
     {
