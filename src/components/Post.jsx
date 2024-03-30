@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import SuiSymbol from "../assets/sui-symbol.png";
+import * as FaIcons from "react-icons/fa";
+import * as MdIcons from "react-icons/md";
 
 const Post = ({ jobPosting, width }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const imageURL = jobPosting.imageURL;
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -23,17 +26,16 @@ const Post = ({ jobPosting, width }) => {
       style={{ width: `${width}px` }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={handlePostClick}
     >
       <div
         className="post-background absolute bg-cover bg-center top-0 left-0 w-full h-full rounded-3xl"
         style={{
-          backgroundImage: `url(${jobPosting.background})`,
+          backgroundImage: `url(${jobPosting.imageURL})`,
           filter: isHovered ? "brightness(50%)" : "brightness(100%)",
         }}
       ></div>
       {isHovered && (
-        <div className="post-content absolute z-10 top-0 left-0 w-full h-full flex flex-col justify-center items-center text-white cursor-pointer">
+        <div className="post-content absolute z-10 top-0 left-0 w-full h-full flex flex-col justify-center items-center text-white cursor-pointer" onClick={handlePostClick}>
           {/* Content you want to show on hover */}
           <div className="post-title text-2xl text-center">{jobPosting.title}</div>
           <div className="post-company text-lg text-faded">By: {jobPosting.company}</div>
@@ -50,11 +52,47 @@ const Post = ({ jobPosting, width }) => {
           </div>
         </div>
       )}
-      {isPopupOpen && ( // Render popup if isPopupOpen is true
-        <div className="popup fixed top-0 left-0 z-20 w-full h-full flex justify-center items-center bg-lightbox bg-cover">
+      {isPopupOpen && (
+        <div className="popup fixed top-0 left-0 z-10 w-full h-full">
+          <div className="popup-bg fixed w-full h-full bg-lightbox bg-cover z-10" onClick={handlePostClick}></div>
           {/* Popup content */}
-          <div className="popup-container w-3/6 h-2/6 bg-white">
-            <button className="close-button" onClick={handlePostClick}>Close</button>
+          <div className="popup-container absolute top-1/4 left-1/4 w-3/6 h-3/6 bg-gray-950 rounded-3xl flex flex-col z-40">
+            <div className="post-image w-full h-10 bg-cover bg-center top-0 left-0 z-30 rounded-t-3xl" style={{
+              backgroundImage: `url(${imageURL})`
+            }}></div>
+            <div className="post-info flex items-end">
+              <div className="post-title mt-4 ml-4 text-2xl text-wrap">{jobPosting.title}</div>
+              <div className="post-tags mx-2 flex align-center justify-left flex-wrap">
+                <div className="post-tag rounded-3xl px-2 bg-lightgrey text-base text-faded">{jobPosting.category}</div>
+              </div>
+            </div>
+            <div className="company-info mt-2 mx-4 text-base font-inter flex items-center">
+              {jobPosting.company} • ☆ {jobPosting.companyRating.toFixed(1)} 
+              <span className="rating-number opacity-50 ml-1">{` (${jobPosting.companyNumberofRatings})`}</span>
+              <a
+                href={`mailto:${jobPosting.email}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="email-link ml-2"
+              ><MdIcons.MdEmail /></a>
+              <a
+                href={jobPosting.discordLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="discord-link ml-2"
+              ><FaIcons.FaDiscord /></a>
+              <a
+                href={jobPosting.twitterLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="twitter-link ml-2"
+              ><FaIcons.FaTwitter /></a>
+            </div>
+            <hr className="line opacity-20 w-11/12 mt-2 mx-4" />
+            <div className="post-description-container local mt-4 mx-4">
+              <h1 className="post-description-title font-inter text-lg font-bold">Job Description</h1>
+              <p className="post-description text-sm font-inter text-wrap">{jobPosting.description}</p>
+            </div>
           </div>
         </div>
       )}

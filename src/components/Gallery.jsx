@@ -30,49 +30,54 @@ const Gallery = () => {
       id: 1,
       category: "Graphics & Design",
       title: "Logo Design",
-      background:
+      imageURL:
         "https://gifdb.com/images/high/light-trails-wave-background-r4tz04b0l8kqi6do.gif",
       datePosted: "March 28, 2024",
       reward: 100,
       rewardDenomination: "SUI",
       company: "Sui Snails",
+      companyRating: 4.0,
+      companyNumberofRatings: 143,
       description: "We are a start-up company in search of a talented and imaginative graphic designer to create a logo that incorporates our love for snails in an artistic and innovative way. Our brand values nature, sustainability, and creativity, and we wish to reflect these themes in our logo.",
       email: "suisnailsnft@gmail.com",
       discordLink: "https://discord.gg/4RjEjQ5AcG",
       twitterLink: "https://twitter.com/suisnails",
-      difficultyLevel: "Hard"
     },
     {
       id: 2,
       category: "Graphics & Design",
       title: "Art Commission",
       company: "Sui Snails",
+      companyRating: 4.0,
+      companyNumberofRatings: 143,
       reward: 100,
       rewardDenomination: "SUI",
-      background:
+      imageURL:
         "https://64.media.tumblr.com/e69d6558a943c0384cf9b6acf11bdcdb/tumblr_mgc4658blx1s2gn79o1_500.gif",
-      difficultyLevel: "Medium"
     },
     {
       id: 3,
       category: "Programming & Tech",
       title: "Staking Platform",
       company: "Sui Snails",
+      companyRating: 4.0,
+      companyNumberofRatings: 143,
       reward: 100,
       rewardDenomination: "SUI",
-      background:
+      imageURL:
         "https://i.pinimg.com/originals/6b/d8/ef/6bd8ef35364c9672c7cbb4687977d3ee.gif",
-      difficultyLevel: "Easy"
     },
     {
       id: 4,
       category: "Digital Marketing",
       title: "Logo Design",
       company: "Sui Snails",
+      companyRating: 4.0,
+      companyNumberofRatings: 143,
       reward: 100,
       rewardDenomination: "SUI",
       difficultyLevel: "Medium",
-      background:
+      imageURL:
         "https://pa1.aminoapps.com/6742/6749ba759fb09d83419d0228a8ad009c864d231d_00.gif",
     },
     {
@@ -80,10 +85,12 @@ const Gallery = () => {
       category: "Video & Animation",
       title: "Art Commission",
       company: "Sui Snails",
+      companyRating: 4.0,
+      companyNumberofRatings: 143,
       reward: 100,
       rewardDenomination: "SUI",
       difficultyLevel: "Hard",
-      background:
+      imageURL:
         "https://i.pinimg.com/originals/c7/12/2a/c7122acb9a6947777f7e3c59b17875ce.gif",
     },
     {
@@ -91,10 +98,12 @@ const Gallery = () => {
       category: "Writing & Translation",
       title: "Staking Platform",
       company: "Sui Snails",
+      companyRating: 4.0,
+      companyNumberofRatings: 143,
       reward: 100,
       rewardDenomination: "SUI",
       difficultyLevel: "Easy",
-      background:
+      imageURL:
         "https://www.icegif.com/wp-content/uploads/2022/01/icegif-543.gif",
     },
   ];

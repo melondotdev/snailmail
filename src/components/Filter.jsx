@@ -31,8 +31,8 @@ const Filter = ({ jobPostings, width }) => {
       <div className="filter-item-container flex flex-col items-center">
         {jobPostingCounts.map(({ category, len }) => (
           <div className="filter-item flex justify-between items-center w-full max-h-28 rounded-2xl bg-gray-700 mb-1" key={category}>
-            <p className="filter-text ml-3 text-gray-300 text-xs">{category.toUpperCase()}</p>
-            <p className="filter-quantity text-gray-300 mr-3 text-sm">{len}</p>
+            <p className="filter-text ml-3 text-faded text-xs">{category.toUpperCase()}</p>
+            <p className="filter-quantity text-gray-400 mr-3 text-sm">{len}</p>
           </div>
         ))}
       </div>
@@ -53,7 +53,7 @@ const Filter = ({ jobPostings, width }) => {
             aA
           </div>
         </div>
-        <div className="flex items-center justify-around w-24 h-7 bg-slate-900 rounded-2xl cursor-pointer text-white duration-30 text-xs hover:bg-gray-800" onClick={handleResetToggle}>
+        <div className="flex items-center justify-around w-24 h-7 bg-slate-900 rounded-2xl cursor-pointer text-faded font-bold duration-30 text-xs hover:bg-gray-800" onClick={handleResetToggle}>
           RESET
         </div>
       </div>

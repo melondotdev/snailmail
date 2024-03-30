@@ -9,7 +9,7 @@ module.exports = {
         ssblue: "#0AAEFF",
         faded: "rgb(163, 162, 162)",
         lightgrey: "rgb(48, 48, 48)",
-        lightbox: "rgb(0, 0, 0, 0.7)"
+        lightbox: "rgb(0, 0, 0, 0.8)"
       },
       fontFamily: {
         anton: "Anton",
