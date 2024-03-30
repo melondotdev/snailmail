@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Filter from "../Filter/Filter";
-import Post from "../Post/Post";
-import "./Gallery.css";
+import Filter from "./Filter";
+import Post from "./Post";
 
 const Gallery = () => {
   // Listener for window width
@@ -101,8 +100,8 @@ const Gallery = () => {
   ];
 
   return (
-    <div className="gallery">
-      <div className="gallery-container">
+    <div className="gallery justify-items-center">
+      <div className="gallery-container flex flex-wrap">
         <Filter jobPostings={jobPostings} width={dynamicItemWidth} />
         {jobPostings.map((jobPosting) => (
           <Post
