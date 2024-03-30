@@ -56,7 +56,7 @@ const Post = ({ jobPosting, width }) => {
         <div className="popup fixed top-0 left-0 z-10 w-full h-full">
           <div className="popup-bg fixed w-full h-full bg-lightbox bg-cover z-10" onClick={handlePostClick}></div>
           {/* Popup content */}
-          <div className="popup-container absolute top-1/4 left-1/4 w-3/6 h-3/6 bg-gray-950 rounded-3xl flex flex-col z-40">
+          <div className="popup-container absolute w-4/6 h-4/6 bg-gray-950 rounded-3xl flex flex-col z-40" style={{top: "15%", left: "15%"}}>
             <div className="post-image w-full h-10 bg-cover bg-center top-0 left-0 z-30 rounded-t-3xl" style={{
               backgroundImage: `url(${imageURL})`
             }}></div>
@@ -89,9 +89,13 @@ const Post = ({ jobPosting, width }) => {
               ><FaIcons.FaTwitter /></a>
             </div>
             <hr className="line opacity-20 w-11/12 mt-2 mx-4" />
-            <div className="post-description-container local mt-4 mx-4">
+            <div className="post-description-container local mt-4 mx-4 h-4/5">
               <h1 className="post-description-title font-inter text-lg font-bold">Job Description</h1>
               <p className="post-description text-sm font-inter text-wrap">{jobPosting.description}</p>
+            </div>
+            <div className="post-actions flex justify-center items-center">
+              <button className="apply flex items-center font-inter text-base m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300"><FaIcons.FaCheck /><span className="ml-1">Apply Now</span></button>
+              <button className="report flex items-center font-inter text-base m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300"><FaIcons.FaFlag /><span className="ml-1">Report Job</span></button>
             </div>
           </div>
         </div>
