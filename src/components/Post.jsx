@@ -4,7 +4,7 @@ import SuiSymbol from "../assets/sui-symbol.png";
 import * as FaIcons from "react-icons/fa";
 import * as MdIcons from "react-icons/md";
 
-const Post = ({ jobPosting, width }) => {
+const Post = ({ jobPosting, width, walletAddress }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isReported, setIsReported] = useState(false);
@@ -167,7 +167,7 @@ const Post = ({ jobPosting, width }) => {
               <div className="description-action-container h-4/5">
                 <div className="post-description-container relative mt-4 mx-4 h-full">
                   <h1 className="post-description-title font-inter text-lg font-bold mb-2">Application Form</h1>
-                  <form className="form-container flex flex-col text-black font-inter">
+                  <form className="form-container flex flex-col text-black font-inter text-sm">
                     <input
                       type="text"
                       name="name"
@@ -176,6 +176,7 @@ const Post = ({ jobPosting, width }) => {
                       placeholder="Name"
                       className="form-input"
                     />
+                    <div className="wallet text-white">Wallet: {walletAddress}</div>
                     <input
                       type="email"
                       name="email"

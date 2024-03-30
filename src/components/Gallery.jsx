@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Filter from "./Filter";
 import Post from "./Post";
 
-const Gallery = () => {
+const Gallery = ({ walletAddress }) => {
   // Listener for window width
   
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -124,6 +124,7 @@ const Gallery = () => {
             key={jobPosting.id}
             jobPosting={jobPosting}
             width={dynamicItemWidth}
+            walletAddress={walletAddress}
           />
         ))}
       </div>
