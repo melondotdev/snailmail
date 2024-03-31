@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Tooltip } from 'react-tooltip'
+import { db } from "../firebase";
+import { ethos, EthosConnectStatus } from "ethos-connect";
+import {
+  collection,
+  getDocs,
+  query,
+  where
+} from "@firebase/firestore";
 import SuiSymbol from "../assets/sui-symbol.png";
 import * as FaIcons from "react-icons/fa";
 import * as MdIcons from "react-icons/md";
 
-const Post = ({ jobPosting, width, walletAddress }) => {
+const Post = ({ jobPosting, width }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isReported, setIsReported] = useState(false);
@@ -12,14 +20,49 @@ const Post = ({ jobPosting, width, walletAddress }) => {
   const [reportMessageOpacity, setReportMessageOpacity] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
+    pubkey: '',
     email: '',
-    discordUsername: '',
-    twitterProfile: '',
-    portfolioLink: '',
-    aboutYourself: '',
+    discord: '',
+    twitter: '',
+    portfolio: '',
+    about: '',
     qualification: ''
   });
   const imageURL = jobPosting.imageURL;
+  const { wallet } = ethos.useWallet();
+  const { status } = ethos.useWallet()
+  const docRef = collection(db, "users");
+    
+  const fetchData = async () => {
+    if (wallet?.address) {
+      const q = query(
+        docRef,
+        where("pubKey", "==", wallet.address)
+      );
+      try {
+        const querySnapshot = await getDocs(q);
+        console.log(querySnapshot);
+        if (!querySnapshot.empty) {
+          const docData = querySnapshot.docs[0].data(); // Assuming one document per user
+          setFormData({
+            name: docData.name || "",
+            pubkey: docData.pubKey || "",
+            about: docData.about || "",
+            email: docData.email || "",
+            portfolio: docData.portfolio || "",
+            discord: docData.discord || "",
+            twitter: docData.twitter || "",
+          });
+        } else {
+          console.log("No document found for the provided public key.");
+        }
+      } catch (error) {
+        console.error("Error fetching data from Firebase:", error);
+      }
+    } else {
+      console.log("Wallet address is undefined.");
+    }
+  };
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -36,14 +79,19 @@ const Post = ({ jobPosting, width, walletAddress }) => {
   };
   
   const handleApplyClick = () => {
-    setIsApplied(!isApplied);
+    setIsApplied(true);
+    fetchData();
+    console.log(wallet.address);
+  };
+  
+  const handleBackClick = () => {
+    setIsApplied(false);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({ ...prevState, [name]: value }));
   };
-  
   
   const handleReportClick = () => {
     setIsReported(true);
@@ -67,7 +115,7 @@ const Post = ({ jobPosting, width, walletAddress }) => {
     return () => {
       clearTimeout(fadeOutTimer);
     };
-  }, [isReported]);
+  }, [isReported]); 
   
   return (
     <div
@@ -105,7 +153,7 @@ const Post = ({ jobPosting, width, walletAddress }) => {
         <div className="popup fixed top-0 left-0 z-10 w-full h-full">
           <div className="popup-bg fixed w-full h-full bg-lightbox bg-cover z-10" onClick={handlePostClick}></div>
           {/* Popup content */}
-          <div className="popup-container absolute w-4/6 h-4/6 bg-gray-950 rounded-3xl flex flex-col z-40" style={{top: "10%", left: "15%"}}>
+          <div className="popup-container absolute w-4/6 h-4/6 bg-gray-800 rounded-3xl flex flex-col z-40" style={{top: "15%", left: "15%"}}>
             <div className="post-image w-full h-10 bg-cover bg-center top-0 left-0 z-30 rounded-t-3xl" style={{
               backgroundImage: `url(${imageURL})`
             }}></div>
@@ -145,8 +193,8 @@ const Post = ({ jobPosting, width, walletAddress }) => {
             </div>
             <hr className="line opacity-20 w-11/12 mt-2 mx-4" />
             {(isApplied === false) ? (
-              <div className="description-action-container h-4/5">
-                <div className="post-description-container relative mt-4 mx-4 h-full overflow-y-auto">
+              <div className="description-action-container h-4/5 flex flex-col justify-evenly">
+                <div className="post-description-container relative py-4 mx-4 h-full overflow-y-auto">
                   <h1 className="post-description-title font-inter text-lg font-bold">Job Description</h1>
                   <div className="post-description text-sm font-inter text-wrap">
                     {jobPosting.description.split('\n').map((line, index) => (
@@ -158,73 +206,39 @@ const Post = ({ jobPosting, width, walletAddress }) => {
                     ))}
                   </div>
                 </div>
-                <div className="post-actions flex justify-center items-center mt-1">
-                  <button className="apply flex items-center font-inter text-base m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300" onClick={handleApplyClick}><FaIcons.FaCheck /><span className="ml-1">Apply Now</span></button>
+                <div className="post-actions flex justify-center items-center">
+                  <button className={`apply flex items-center font-inter text-base m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300`} onClick={handleApplyClick} disabled={!(status === EthosConnectStatus.Connected)} data-tooltip-id="can-apply" data-tooltip-content="Sign In First!"><FaIcons.FaCheck /><span className="ml-1">Apply Now</span></button>
+                  {!(status === EthosConnectStatus.Connected) && ( // Only render the Tooltip when the apply button is disabled
+                    <Tooltip id="can-apply" place="top" effect="solid" className="font-inter">
+                      You cannot apply because no user data found for the provided public key.
+                    </Tooltip>
+                  )}
                   <button className="report flex items-center font-inter text-base m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300" onClick={handleReportClick}><FaIcons.FaFlag /><span className="ml-1">Report Job</span></button>
                 </div>
               </div>
             ) : (
               <div className="description-action-container h-4/5">
-                <div className="post-description-container relative mt-4 mx-4 h-full">
+                <div className="post-description-container relative font-inter text-sm mt-4 mx-4 h-full">
                   <h1 className="post-description-title font-inter text-lg font-bold mb-2">Application Form</h1>
-                  <form className="form-container flex flex-col text-black font-inter text-sm">
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Name"
-                      className="form-input"
-                    />
-                    <div className="wallet text-white">Wallet: {walletAddress}</div>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="Email"
-                      className="form-input"
-                    />
-                    <input
-                      type="text"
-                      name="discordUsername"
-                      value={formData.discordUsername}
-                      onChange={handleInputChange}
-                      placeholder="Discord Username"
-                      className="form-input"
-                    />
-                    <input
-                      type="text"
-                      name="twitterProfile"
-                      value={formData.twitterProfile}
-                      onChange={handleInputChange}
-                      placeholder="Twitter Profile"
-                      className="form-input"
-                    />
-                    <input
-                      type="text"
-                      name="portfolioLink"
-                      value={formData.portfolioLink}
-                      onChange={handleInputChange}
-                      placeholder="Link to Portfolio"
-                      className="form-input"
-                    />
-                    <textarea
-                      name="aboutYourself"
-                      value={formData.aboutYourself}
-                      onChange={handleInputChange}
-                      placeholder="Tell me about yourself"
-                      className="form-textarea"
-                    ></textarea>
-                    <textarea
-                      name="qualification"
-                      value={formData.qualification}
-                      onChange={handleInputChange}
-                      placeholder="Why are you qualified for this role?"
-                      className="form-textarea"
-                    ></textarea>
+                  <form className="form-container flex flex-col h-5/6 justify-between">
+                    <div className="inputs flex flex-col text-white h-full">
+                      <div>Name: {formData.name}</div>
+                      <div>About: {formData.about}</div>
+                      <div>Wallet: {formData.pubkey}</div>
+                      <div>Email: {formData.email}</div>
+                      <div>Portfolio: {formData.portfolio}</div>
+                      <div>Discord: {formData.discord}</div>
+                      <div>Twitter: {formData.twitter}</div>
+                      <textarea
+                        name="qualification"
+                        value={formData.qualification}
+                        onChange={handleInputChange}
+                        placeholder="Why are you qualified for this role?"
+                        className="form-textarea mt-4 p-1 h-full bg-black text-black"
+                      ></textarea>
+                    </div>
                     <div className="post-actions flex justify-center items-center mt-1">
-                      <button type="button" className="apply flex items-center font-inter text-base text-white m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300" onClick={handleApplyClick}><MdIcons.MdArrowBack /><span className="ml-1">Back</span></button>
+                      <button type="button" className="apply flex items-center font-inter text-base text-white m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300" onClick={handleBackClick}><MdIcons.MdArrowBack /><span className="ml-1">Back</span></button>
                       <button type="submit" className="report flex items-center font-inter text-base text-white m-4 py-1 px-2 border-2 rounded-3xl hover:bg-darkishblue ease-in-out duration-300"><FaIcons.FaCheck /><span className="ml-1">Submit</span></button>
                     </div>
                   </form>

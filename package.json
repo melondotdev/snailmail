@@ -1,14 +1,14 @@
 {
   "name": "lancer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "dependencies": {
     "@mysten/sui.js": "^0.51.1",
-    "@mysten/zklogin": "^0.5.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "ethos-connect": "^0.0.194",
+    "firebase": "^10.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
@@ -17,7 +17,6 @@
     "react-toggle": "^4.1.3",
     "react-tooltip": "^5.26.3",
     "reactjs-popup": "^2.0.6",
-    "superstruct": "^1.0.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
