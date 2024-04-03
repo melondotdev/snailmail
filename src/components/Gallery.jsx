@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import Filter from "./Filter";
 import Post from "./Post";
 
-const Gallery = () => {
-  // Listener for window width
+const Gallery = ({ userData, isLoggedIn }) => {
   
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
@@ -11,7 +10,7 @@ const Gallery = () => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-
+    
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
@@ -122,8 +121,10 @@ const Gallery = () => {
         {jobPostings.map((jobPosting) => (
           <Post
             key={jobPosting.id}
+            isLoggedIn={isLoggedIn}
             jobPosting={jobPosting}
             width={dynamicItemWidth}
+            userData={userData}
           />
         ))}
       </div>

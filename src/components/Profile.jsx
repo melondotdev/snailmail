@@ -1,47 +1,19 @@
-import { useCallback } from 'react'
-import { ethos } from 'ethos-connect'
+import React from 'react';
 import * as MdIcons from "react-icons/md";
 
-const {
-  components: { MenuButton },
-} = ethos
-
-const Profile = ({ onClick, setIsPopupOpen }) => {
+const Profile = ({ setIsPopupOpen, setIsMenuOpen }) => {
   
-  const editProfile = useCallback(() => {
+  const editProfile = () => {
     setIsPopupOpen(true);
-    onClick();
-  }, [setIsPopupOpen, onClick])
-  
-  const children = useCallback(
-    (hover) => (
-      <>
-        <MdIcons.MdPerson>
-          <path
-            d="M12 9V15M15 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-            stroke={hover ? 'white' : 'black'}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </MdIcons.MdPerson>
-        Profile
-      </>
-    ),
-    []
-  )
+    setIsMenuOpen(false); // Close the menu
+  }
   
   return (
-    <div className='menu-button'>
-      <MenuButton
-        className="item-center flex gap-1"
-        onClick={editProfile}
-        hoverChildren={children(true)}
-      >
-        {children(false)}
-      </MenuButton>
+    <div className="profile flex items-center text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-ssblue hover:text-black" onClick={editProfile}>
+      <MdIcons.MdPerson className='mr-2'/>
+      Edit Profile
     </div>
   )
 }
 
-export default Profile
+export default Profile;
