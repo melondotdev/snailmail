@@ -1,0 +1,1 @@
+export const JOB_POST = "0xbcd908a65faeba3f78d7bac72b4afd7e762d8d7bf6f164ff690ab54ecaec5a26"

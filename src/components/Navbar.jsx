@@ -1,52 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import {
-  updateDoc,
-} from "@firebase/firestore";
 import Login from "./Auth/Login";
-import UserOptions from "./UserOptions";
-import EditProfile from "./EditProfile";
-import fetchData from '../components/FetchData';
+import UserOptions from "./UserOptions/UserOptions";
+import SuiSymbol from "../assets/sui-symbol.png";
 
-const Navbar = ({ isLoggedIn, uid, userData, setUserData }) => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-
-  const saveData = async (formChanges) => {
-    if (!userData.empty) {
-      // Log formChanges and userData to debug
-      console.log("Form Changes:", formChanges);
-      console.log("User Data:", userData.docs[0].data());
-  
-      const docRef = userData.docs[0].ref;
-      const updates = {};
-  
-      // Iterate through formChanges to see which fields were updated
-      Object.keys(formChanges).forEach((key) => {
-        if (formChanges[key]) {
-          updates[key] = formChanges[key];
-        }
-      });
-  
-      // Log updates to verify which fields will be updated
-      console.log("Updates:", updates);
-  
-      try {
-        if (Object.keys(updates).length > 0) {
-          await updateDoc(docRef, updates);
-          console.log("Updated sections saved successfully.");
-          const userDataSnapshot = await fetchData(uid);
-          setUserData(userDataSnapshot);
-        } else {
-          console.log("No changes to save.");
-        }
-      } catch (error) {
-        console.error("Error saving responses:", error);
-      }
-    } else {
-      console.log("No document found for the current user.");
-    }
+const Navbar = ({ walletData, isLoggedIn, isWalletConnected, setIsEditProfile, setIsMintJobPost }) => {
+  const formatWalletAddress = (address) => {
+    if (!address) return ''; // Return empty string if address is not provided
+    const firstFour = address.substring(0, 4); // Extract first four characters
+    const lastFour = address.substring(address.length - 4); // Extract last four characters
+    return `${firstFour}...${lastFour}`; // Concatenate with "..." in the middle
   };
-  
   
   return (
     <div className="navbar flex justify-between items-center h-20 font-anton bg-transparent text-white z-10">
@@ -61,18 +25,19 @@ const Navbar = ({ isLoggedIn, uid, userData, setUserData }) => {
         {!isLoggedIn ? (
             <Login />
           ) : (
-            <UserOptions setIsPopupOpen={setIsPopupOpen} />
+            <React.Fragment>
+              {isWalletConnected && (
+                <div className="wallet-details flex font-inter items-center text-base bg-transparent mt-1">
+                  <img src={SuiSymbol} alt='symbol' className="h-4 w-auto mr-1"></img>
+                  <p className="mr-4">{(parseInt(walletData?.Balance || 0) / 1000000000).toFixed(2).toString()}</p>
+                  <p>{formatWalletAddress(walletData?.Address)}</p>
+                </div>
+              )}
+              <UserOptions isWalletConnected={isWalletConnected} setIsEditProfile={setIsEditProfile} setIsMintJobPost={setIsMintJobPost} />
+            </React.Fragment>
           )
         }
       </div>
-      {isPopupOpen && (
-        <EditProfile 
-          userData={userData} 
-          setIsPopupOpen={setIsPopupOpen} 
-          isPopupOpen={isPopupOpen} 
-          saveData={saveData}
-        />
-      )}
     </div>
   );
 };
