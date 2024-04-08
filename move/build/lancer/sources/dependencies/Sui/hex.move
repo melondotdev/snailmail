@@ -3,6 +3,7 @@
 
 /// HEX (Base16) encoding utility.
 module sui::hex {
+    use std::vector;
 
     const EInvalidHexLength: u64 = 0;
     const ENotValidHexCharacter: u64 = 1;
@@ -14,10 +15,13 @@ module sui::hex {
 
     /// Encode `bytes` in lowercase hex
     public fun encode(bytes: vector<u8>): vector<u8> {
-        let (mut i, mut r, l) = (0, vector[], bytes.length());
+        let (i, r, l) = (0, vector[], vector::length(&bytes));
         let hex_vector = HEX;
         while (i < l) {
-            r.append(hex_vector[bytes[i] as u64]);
+            vector::append(
+                &mut r,
+                *vector::borrow(&hex_vector, (*vector::borrow(&bytes, i) as u64))
+            );
             i = i + 1;
         };
         r
@@ -30,11 +34,12 @@ module sui::hex {
     /// Aborts if the hex string does not have an even number of characters (as each hex character is 2 characters long)
     /// Aborts if the hex string contains non-valid hex characters (valid characters are 0 - 9, a - f, A - F)
     public fun decode(hex: vector<u8>): vector<u8> {
-        let (mut i, mut r, l) = (0, vector[], hex.length());
+        let (i, r, l) = (0, vector[], vector::length(&hex));
         assert!(l % 2 == 0, EInvalidHexLength);
         while (i < l) {
-            let decimal = decode_byte(hex[i]) * 16 + decode_byte(hex[i + 1]);
-            r.push_back(decimal);
+            let decimal = (decode_byte(*vector::borrow(&hex, i)) * 16) +
+                          decode_byte(*vector::borrow(&hex, i + 1));
+            vector::push_back(&mut r, decimal);
             i = i + 2;
         };
         r

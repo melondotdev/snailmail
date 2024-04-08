@@ -5,11 +5,9 @@
 /// module to allow balance operations and can be used to implement
 /// custom coins with `Supply` and `Balance`s.
 module sui::balance {
+    use sui::tx_context::{Self, TxContext};
 
-    /// Allows calling `.into_coin()` on a `Balance` to turn it into a coin.
-    public use fun sui::coin::from_balance as Balance.into_coin;
-
-    /* friend sui::sui; */
+    friend sui::sui;
 
     /// For when trying to destroy a non-zero balance.
     const ENonZero: u64 = 0;
@@ -22,13 +20,13 @@ module sui::balance {
 
     /// A Supply of T. Used for minting and burning.
     /// Wrapped into a `TreasuryCap` in the `Coin` module.
-    public struct Supply<phantom T> has store {
+    struct Supply<phantom T> has store {
         value: u64
     }
 
     /// Storable balance - an inner struct of a Coin type.
     /// Can be used to store coins which don't need the key ability.
-    public struct Balance<phantom T> has store {
+    struct Balance<phantom T> has store {
         value: u64
     }
 
@@ -98,7 +96,7 @@ module sui::balance {
     /// It should only be called by the epoch change system txn to create staking rewards,
     /// and nowhere else.
     fun create_staking_rewards<T>(value: u64, ctx: &TxContext): Balance<T> {
-        assert!(ctx.sender() == @0x0, ENotSystemAddress);
+        assert!(tx_context::sender(ctx) == @0x0, ENotSystemAddress);
         Balance { value }
     }
 
@@ -107,12 +105,12 @@ module sui::balance {
     /// It should only be called by the epoch change system txn to destroy storage rebates,
     /// and nowhere else.
     fun destroy_storage_rebates<T>(self: Balance<T>, ctx: &TxContext) {
-        assert!(ctx.sender() == @0x0, ENotSystemAddress);
+        assert!(tx_context::sender(ctx) == @0x0, ENotSystemAddress);
         let Balance { value: _ } = self;
     }
 
     /// Destroy a `Supply` preventing any further minting and burning.
-    public(package) fun destroy_supply<T>(self: Supply<T>): u64 {
+    public(friend) fun destroy_supply<T>(self: Supply<T>): u64 {
         let Supply { value } = self;
         value
     }
@@ -145,22 +143,22 @@ module sui::balance_tests {
 
     #[test]
     fun test_balance() {
-        let mut balance = balance::zero<SUI>();
+        let balance = balance::zero<SUI>();
         let another = balance::create_for_testing(1000);
 
-        balance.join(another);
+        balance::join(&mut balance, another);
 
-        assert!(balance.value() == 1000, 0);
+        assert!(balance::value(&balance) == 1000, 0);
 
-        let balance1 = balance.split(333);
-        let balance2 = balance.split(333);
-        let balance3 = balance.split(334);
+        let balance1 = balance::split(&mut balance, 333);
+        let balance2 = balance::split(&mut balance, 333);
+        let balance3 = balance::split(&mut balance, 334);
 
-        balance.destroy_zero();
+        balance::destroy_zero(balance);
 
-        assert!(balance1.value() == 333, 1);
-        assert!(balance2.value() == 333, 2);
-        assert!(balance3.value() == 334, 3);
+        assert!(balance::value(&balance1) == 333, 1);
+        assert!(balance::value(&balance2) == 333, 2);
+        assert!(balance::value(&balance3) == 334, 3);
 
         test_utils::destroy(balance1);
         test_utils::destroy(balance2);

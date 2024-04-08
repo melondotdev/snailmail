@@ -24,8 +24,7 @@ const Login = () => {
   
   const sendEmailLink = (email) => { // Modify function to accept email as parameter
     const actionCodeSettings = {
-      // url: 'https://lancer.suisnails.io',
-      url: 'http://localhost:3000/',
+      url: 'https://lancer.suisnails.io',
       handleCodeInApp: true,
     };
     

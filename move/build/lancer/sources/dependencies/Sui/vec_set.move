@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 module sui::vec_set {
+    use std::option::{Self, Option};
+    use std::vector;
 
     /// This key already exists in the map
     const EKeyAlreadyExists: u64 = 0;
@@ -14,41 +16,41 @@ module sui::vec_set {
     /// - the intention of this data structure is only to provide the convenience
     /// of programming against a set API. Sets that need sorted iteration rather
     /// than insertion order iteration should be handwritten.
-    public struct VecSet<K: copy + drop> has copy, drop, store {
+    struct VecSet<K: copy + drop> has copy, drop, store {
         contents: vector<K>,
     }
 
     /// Create an empty `VecSet`
     public fun empty<K: copy + drop>(): VecSet<K> {
-        VecSet { contents: vector[] }
+        VecSet { contents: vector::empty() }
     }
 
     /// Create a singleton `VecSet` that only contains one element.
     public fun singleton<K: copy + drop>(key: K): VecSet<K> {
-        VecSet { contents: vector[key] }
+        VecSet { contents: vector::singleton(key) }
     }
 
     /// Insert a `key` into self.
     /// Aborts if `key` is already present in `self`.
     public fun insert<K: copy + drop>(self: &mut VecSet<K>, key: K) {
-        assert!(!self.contains(&key), EKeyAlreadyExists);
-        self.contents.push_back(key)
+        assert!(!contains(self, &key), EKeyAlreadyExists);
+        vector::push_back(&mut self.contents, key)
     }
 
     /// Remove the entry `key` from self. Aborts if `key` is not present in `self`.
     public fun remove<K: copy + drop>(self: &mut VecSet<K>, key: &K) {
         let idx = get_idx(self, key);
-        self.contents.remove(idx);
+        vector::remove(&mut self.contents, idx);
     }
 
     /// Return true if `self` contains an entry for `key`, false otherwise
     public fun contains<K: copy + drop>(self: &VecSet<K>, key: &K): bool {
-        get_idx_opt(self, key).is_some()
+        option::is_some(&get_idx_opt(self, key))
     }
 
     /// Return the number of entries in `self`
     public fun size<K: copy + drop>(self: &VecSet<K>): u64 {
-        self.contents.length()
+        vector::length(&self.contents)
     }
 
     /// Return true if `self` has 0 elements, false otherwise
@@ -75,10 +77,10 @@ module sui::vec_set {
     /// Find the index of `key` in `self`. Return `None` if `key` is not in `self`.
     /// Note that keys are stored in insertion order, *not* sorted.
     fun get_idx_opt<K: copy + drop>(self: &VecSet<K>, key: &K): Option<u64> {
-        let mut i = 0;
+        let i = 0;
         let n = size(self);
         while (i < n) {
-            if (&self.contents[i] == key) {
+            if (vector::borrow(&self.contents, i) == key) {
                 return option::some(i)
             };
             i = i + 1;
@@ -90,7 +92,7 @@ module sui::vec_set {
     /// Note that map entries are stored in insertion order, *not* sorted.
     fun get_idx<K: copy + drop>(self: &VecSet<K>, key: &K): u64 {
         let idx_opt = get_idx_opt(self, key);
-        assert!(idx_opt.is_some(), EKeyDoesNotExist);
-        idx_opt.destroy_some()
+        assert!(option::is_some(&idx_opt), EKeyDoesNotExist);
+        option::destroy_some(idx_opt)
     }
 }

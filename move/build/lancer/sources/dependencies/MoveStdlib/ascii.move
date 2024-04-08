@@ -4,10 +4,8 @@
 /// The `ASCII` module defines basic string and char newtypes in Move that verify
 /// that characters are valid ASCII, and that strings consist of only valid ASCII characters.
 module std::ascii {
+    use std::vector;
     use std::option::{Self, Option};
-
-    // Allows calling `.to_string()` to convert an `ascii::String` into as `string::String`
-    public use fun std::string::from_ascii as String.to_string;
 
     /// An invalid ASCII character was encountered when creating an ASCII string.
     const EINVALID_ASCII_CHARACTER: u64 = 0x10000;
@@ -17,12 +15,12 @@ module std::ascii {
     /// be printable. To determine if a `String` contains only "printable"
     /// characters you should use the `all_characters_printable` predicate
     /// defined in this module.
-    public struct String has copy, drop, store {
+    struct String has copy, drop, store {
         bytes: vector<u8>,
     }
 
     /// An ASCII character.
-    public struct Char has copy, drop, store {
+    struct Char has copy, drop, store {
         byte: u8,
     }
 
@@ -36,18 +34,21 @@ module std::ascii {
     /// `bytes` contains non-ASCII characters.
     public fun string(bytes: vector<u8>): String {
        let x = try_string(bytes);
-       assert!(x.is_some(), EINVALID_ASCII_CHARACTER);
-       x.destroy_some()
+       assert!(
+            option::is_some(&x),
+            EINVALID_ASCII_CHARACTER
+       );
+       option::destroy_some(x)
     }
 
     /// Convert a vector of bytes `bytes` into an `String`. Returns
     /// `Some(<ascii_string>)` if the `bytes` contains all valid ASCII
     /// characters. Otherwise returns `None`.
     public fun try_string(bytes: vector<u8>): Option<String> {
-        let len = bytes.length();
-        let mut i = 0;
+        let len = vector::length(&bytes);
+        let i = 0;
         while (i < len) {
-            let possible_byte = bytes[i];
+            let possible_byte = *vector::borrow(&bytes, i);
             if (!is_valid_char(possible_byte)) return option::none();
             i = i + 1;
         };
@@ -57,10 +58,10 @@ module std::ascii {
     /// Returns `true` if all characters in `string` are printable characters
     /// Returns `false` otherwise. Not all `String`s are printable strings.
     public fun all_characters_printable(string: &String): bool {
-        let len = string.bytes.length();
-        let mut i = 0;
+        let len = vector::length(&string.bytes);
+        let i = 0;
         while (i < len) {
-            let byte = string.bytes[i];
+            let byte = *vector::borrow(&string.bytes, i);
             if (!is_printable_char(byte)) return false;
             i = i + 1;
         };
@@ -68,15 +69,15 @@ module std::ascii {
     }
 
     public fun push_char(string: &mut String, char: Char) {
-        string.bytes.push_back(char.byte);
+        vector::push_back(&mut string.bytes, char.byte);
     }
 
     public fun pop_char(string: &mut String): Char {
-        Char { byte: string.bytes.pop_back() }
+        Char { byte: vector::pop_back(&mut string.bytes) }
     }
 
     public fun length(string: &String): u64 {
-        string.as_bytes().length()
+        vector::length(as_bytes(string))
     }
 
     /// Get the inner bytes of the `string` as a reference

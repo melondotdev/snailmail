@@ -147,7 +147,7 @@ module lancer::job_post {
       creator: tx_context::sender(ctx),
       name: nft.name,
     });
-
+    
     transfer::transfer(nft, tx_context::sender(ctx));
   }
   

@@ -4,6 +4,11 @@
 #[allow(unused_const)]
 module sui::zklogin_verified_issuer {
     use std::string::String;
+    use sui::transfer;
+    use sui::object;
+    use sui::object::UID;
+    use sui::tx_context::TxContext;
+    use sui::tx_context;
 
     /// Error if the proof consisting of the inputs provided to the verification function is invalid.
     const EInvalidInput: u64 = 0;
@@ -13,7 +18,7 @@ module sui::zklogin_verified_issuer {
 
     /// Posession of a VerifiedIssuer proves that the user's address was created using zklogin and with the given issuer
     /// (identity provider).
-    public struct VerifiedIssuer has key {
+    struct VerifiedIssuer has key {
         /// The ID of this VerifiedIssuer
         id: UID,
         /// The address this VerifiedID is associated with
@@ -35,7 +40,7 @@ module sui::zklogin_verified_issuer {
     /// Delete a VerifiedIssuer
     public fun delete(verified_issuer: VerifiedIssuer) {
         let VerifiedIssuer { id, owner: _, issuer: _ } = verified_issuer;
-        id.delete();
+        object::delete(id);
     }
 
     /// Verify that the caller's address was created using zklogin with the given issuer. If so, a VerifiedIssuer object
@@ -47,7 +52,7 @@ module sui::zklogin_verified_issuer {
         issuer: String,
         ctx: &mut TxContext,
     ) {
-        let sender = ctx.sender();
+        let sender = tx_context::sender(ctx);
         assert!(check_zklogin_issuer(sender, address_seed, &issuer), EInvalidProof);
         transfer::transfer(
             VerifiedIssuer {
@@ -65,7 +70,7 @@ module sui::zklogin_verified_issuer {
         address_seed: u256,
         issuer: &String,
     ): bool {
-        check_zklogin_issuer_internal(address, address_seed, issuer.bytes())
+        check_zklogin_issuer_internal(address, address_seed, std::string::bytes(issuer))
     }
 
     /// Returns true if `address` was created using zklogin with the given issuer and address seed.

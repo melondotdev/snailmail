@@ -6,6 +6,8 @@
 /// themselves. This allows for the objects to still exist within in storage, which may be important
 /// for external tools. The difference is otherwise not observable from within Move.
 module sui::dynamic_object_field {
+    use std::option::{Self, Option};
+    use sui::object::{Self, UID, ID};
     use sui::dynamic_field::{
         Self as field,
         add_child_object,
@@ -16,7 +18,7 @@ module sui::dynamic_object_field {
 
     // Internal object used for storing the field and the name associated with the value
     // The separate type is necessary to prevent key collision with direct usage of dynamic_field
-    public struct Wrapper<Name> has copy, drop, store {
+    struct Wrapper<Name> has copy, drop, store {
         name: Name,
     }
 
@@ -32,7 +34,7 @@ module sui::dynamic_object_field {
         let id = object::id(&value);
         field::add(object, key, id);
         let (field, _) = field::field_info<Wrapper<Name>>(object, key);
-        add_child_object(field.to_address(), value);
+        add_child_object(object::uid_to_address(field), value);
     }
 
     /// Immutably borrows the `object`s dynamic object field with the name specified by `name: Name`.
@@ -72,7 +74,7 @@ module sui::dynamic_object_field {
     ): Value {
         let key = Wrapper { name };
         let (field, value_id) = field::field_info<Wrapper<Name>>(object, key);
-        let value = remove_child_object<Value>(field.to_address(), value_id);
+        let value = remove_child_object<Value>(object::uid_to_address(field), value_id);
         field::remove<Wrapper<Name>, ID>(object, key);
         value
     }
@@ -96,7 +98,7 @@ module sui::dynamic_object_field {
         let key = Wrapper { name };
         if (!field::exists_with_type<Wrapper<Name>, ID>(object, key)) return false;
         let (field, value_id) = field::field_info<Wrapper<Name>>(object, key);
-        field::has_child_object_with_ty<Value>(field.to_address(), value_id)
+        field::has_child_object_with_ty<Value>(object::uid_to_address(field), value_id)
     }
 
     /// Returns the ID of the object associated with the dynamic object field
@@ -107,7 +109,7 @@ module sui::dynamic_object_field {
     ): Option<ID> {
         let key = Wrapper { name };
         if (!field::exists_with_type<Wrapper<Name>, ID>(object, key)) return option::none();
-        let (_field, value_addr) = field::field_info<Wrapper<Name>>(object, key);
-        option::some(value_addr.to_id())
+        let (_field, value_id) = field::field_info<Wrapper<Name>>(object, key);
+        option::some(object::id_from_address(value_id))
     }
 }

@@ -98,12 +98,12 @@ const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost }) => {
         {nftObjectId && (
           <SuccessMessage reset={reset}>
             <a 
-              href={`https://suiscan.xyz/devnet/object/${nftObjectId}`}
+              href={`https://suiscan.xyz/mainnet/object/${nftObjectId}`}
               target="_blank" 
               rel="noreferrer"
               className='underline font-blue-600' 
             >
-              View Your NFT on the DevNet Explorer 
+              View Your NFT on Sui Scan 
             </a>
           </SuccessMessage>
         )}

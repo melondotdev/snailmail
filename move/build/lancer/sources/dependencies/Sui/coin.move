@@ -7,22 +7,15 @@
 module sui::coin {
     use std::string;
     use std::ascii;
+    use std::option::{Self, Option};
     use sui::balance::{Self, Balance, Supply};
+    use sui::tx_context::TxContext;
+    use sui::object::{Self, UID, ID};
+    use sui::transfer;
     use sui::url::{Self, Url};
+    use std::vector;
     use sui::deny_list::{Self, DenyList};
     use std::type_name;
-
-    // Allows calling `.split_vec(amounts, ctx)` on `coin`
-    public use fun sui::pay::split_vec as Coin.split_vec;
-
-    // Allows calling `.join_vec(coins)` on `coin`
-    public use fun sui::pay::join_vec as Coin.join_vec;
-
-    // Allows calling `.split_and_transfer(amount, recipient, ctx)` on `coin`
-    public use fun sui::pay::split_and_transfer as Coin.split_and_transfer;
-
-    // Allows calling `.divide_and_keep(n, ctx)` on `coin`
-    public use fun sui::pay::divide_and_keep as Coin.divide_and_keep;
 
     /// A type passed to create_supply is not a one-time witness.
     const EBadWitness: u64 = 0;
@@ -32,14 +25,14 @@ module sui::coin {
     const ENotEnough: u64 = 2;
 
     /// A coin of type `T` worth `value`. Transferable and storable
-    public struct Coin<phantom T> has key, store {
+    struct Coin<phantom T> has key, store {
         id: UID,
         balance: Balance<T>
     }
 
     /// Each Coin type T created through `create_currency` function will have a
     /// unique instance of CoinMetadata<T> that stores the metadata for this coin type.
-    public struct CoinMetadata<phantom T> has key, store {
+    struct CoinMetadata<phantom T> has key, store {
         id: UID,
         /// Number of decimal places the coin uses.
         /// A coin with `value ` N and `decimals` D should be shown as N / 10^D
@@ -58,7 +51,7 @@ module sui::coin {
 
     /// Similar to CoinMetadata, but created only for regulated coins that use the DenyList.
     /// This object is always immutable.
-    public struct RegulatedCoinMetadata<phantom T> has key {
+    struct RegulatedCoinMetadata<phantom T> has key {
         id: UID,
         /// The ID of the coin's CoinMetadata object.
         coin_metadata_object: ID,
@@ -68,14 +61,14 @@ module sui::coin {
 
     /// Capability allowing the bearer to mint and burn
     /// coins of type `T`. Transferable
-    public struct TreasuryCap<phantom T> has key, store {
+    struct TreasuryCap<phantom T> has key, store {
         id: UID,
         total_supply: Supply<T>
     }
 
     /// Capability allowing the bearer to freeze addresses, preventing those addresses from
     /// interacting with the coin as an input to a transaction.
-    public struct DenyCap<phantom T> has key, store {
+    struct DenyCap<phantom T> has key, store {
         id: UID,
     }
 
@@ -92,7 +85,7 @@ module sui::coin {
     /// to different security guarantees (TreasuryCap can be created only once for a type)
     public fun treasury_into_supply<T>(treasury: TreasuryCap<T>): Supply<T> {
         let TreasuryCap { id, total_supply } = treasury;
-        id.delete();
+        object::delete(id);
         total_supply
     }
 
@@ -110,7 +103,7 @@ module sui::coin {
 
     /// Public getter for the coin's value
     public fun value<T>(self: &Coin<T>): u64 {
-        self.balance.value()
+        balance::value(&self.balance)
     }
 
     /// Get immutable reference to the balance of a coin.
@@ -131,7 +124,7 @@ module sui::coin {
     /// Destruct a Coin wrapper and keep the balance.
     public fun into_balance<T>(coin: Coin<T>): Balance<T> {
         let Coin { id, balance } = coin;
-        id.delete();
+        object::delete(id);
         balance
     }
 
@@ -142,13 +135,13 @@ module sui::coin {
     ): Coin<T> {
         Coin {
             id: object::new(ctx),
-            balance: balance.split(value)
+            balance: balance::split(balance, value)
         }
     }
 
     /// Put a `Coin<T>` to the `Balance<T>`.
     public fun put<T>(balance: &mut Balance<T>, coin: Coin<T>) {
-        balance.join(into_balance(coin));
+        balance::join(balance, into_balance(coin));
     }
 
     // === Base Coin functionality ===
@@ -157,8 +150,8 @@ module sui::coin {
     /// Aborts if `c.value + self.value > U64_MAX`
     public entry fun join<T>(self: &mut Coin<T>, c: Coin<T>) {
         let Coin { id, balance } = c;
-        id.delete();
-        self.balance.join(balance);
+        object::delete(id);
+        balance::join(&mut self.balance, balance);
     }
 
     /// Split coin `self` to two coins, one with balance `split_amount`,
@@ -177,11 +170,11 @@ module sui::coin {
         assert!(n > 0, EInvalidArg);
         assert!(n <= value(self), ENotEnough);
 
-        let mut vec = vector[];
-        let mut i = 0;
+        let vec = vector::empty<Coin<T>>();
+        let i = 0;
         let split_amount = value(self) / n;
         while (i < n - 1) {
-            vec.push_back(self.split(split_amount, ctx));
+            vector::push_back(&mut vec, split(self, split_amount, ctx));
             i = i + 1;
         };
         vec
@@ -196,8 +189,8 @@ module sui::coin {
     /// Destroy a coin with value zero
     public fun destroy_zero<T>(c: Coin<T>) {
         let Coin { id, balance } = c;
-        id.delete();
-        balance.destroy_zero()
+        object::delete(id);
+        balance::destroy_zero(balance)
     }
 
     // === Registering new coin types and managing the coin supply ===
@@ -272,7 +265,7 @@ module sui::coin {
     ): Coin<T> {
         Coin {
             id: object::new(ctx),
-            balance: cap.total_supply.increase_supply(value)
+            balance: balance::increase_supply(&mut cap.total_supply, value)
         }
     }
 
@@ -282,15 +275,15 @@ module sui::coin {
     public fun mint_balance<T>(
         cap: &mut TreasuryCap<T>, value: u64
     ): Balance<T> {
-        cap.total_supply.increase_supply(value)
+        balance::increase_supply(&mut cap.total_supply, value)
     }
 
     /// Destroy the coin `c` and decrease the total supply in `cap`
     /// accordingly.
     public entry fun burn<T>(cap: &mut TreasuryCap<T>, c: Coin<T>): u64 {
         let Coin { id, balance } = c;
-        id.delete();
-        cap.total_supply.decrease_supply(balance)
+        object::delete(id);
+        balance::decrease_supply(&mut cap.total_supply, balance)
     }
 
     /// The index into the deny list vector for the `sui::coin::Coin` type.
@@ -304,12 +297,12 @@ module sui::coin {
        addr: address,
        _ctx: &mut TxContext
     ) {
-        let `type` =
-            type_name::into_string(type_name::get_with_original_ids<T>()).into_bytes();
+        let type =
+            ascii::into_bytes(type_name::into_string(type_name::get_with_original_ids<T>()));
         deny_list::add(
             deny_list,
             DENY_LIST_COIN_INDEX,
-            `type`,
+            type,
             addr,
         )
     }
@@ -322,12 +315,12 @@ module sui::coin {
        addr: address,
        _ctx: &mut TxContext
     ) {
-        let `type` =
-            type_name::into_string(type_name::get_with_original_ids<T>()).into_bytes();
+        let type =
+            ascii::into_bytes(type_name::into_string(type_name::get_with_original_ids<T>()));
         deny_list::remove(
             deny_list,
             DENY_LIST_COIN_INDEX,
-            `type`,
+            type,
             addr,
         )
     }
@@ -341,8 +334,13 @@ module sui::coin {
         let name = type_name::get_with_original_ids<T>();
         if (type_name::is_primitive(&name)) return false;
 
-        let `type` = type_name::into_string(name).into_bytes();
-        freezer.contains(DENY_LIST_COIN_INDEX, `type`, addr)
+        let type = ascii::into_bytes(type_name::into_string(name));
+        deny_list::contains(
+            freezer,
+            DENY_LIST_COIN_INDEX,
+            type,
+            addr,
+        )
     }
 
     // === Entrypoints ===
@@ -418,8 +416,8 @@ module sui::coin {
     /// Burn coins of any type for testing purposes only
     public fun burn_for_testing<T>(coin: Coin<T>): u64 {
         let Coin { id, balance } = coin;
-        id.delete();
-        balance.destroy_for_testing()
+        object::delete(id);
+        balance::destroy_for_testing(balance)
     }
 
     #[test_only]
@@ -442,7 +440,7 @@ module sui::coin {
 
     // deprecated as we have CoinMetadata now
     #[allow(unused_field)]
-    public struct CurrencyCreated<phantom T> has copy, drop {
+    struct CurrencyCreated<phantom T> has copy, drop {
         decimals: u8
     }
 }

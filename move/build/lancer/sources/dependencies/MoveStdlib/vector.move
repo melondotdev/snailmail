@@ -6,20 +6,6 @@
 /// vectors are growable. This module has many native functions.
 module std::vector {
 
-    /// Allows calling `.to_string()` on a vector of `u8` to get a utf8 `String`.
-    public use fun std::string::utf8 as vector.to_string;
-
-    /// Allows calling `.try_to_string()` on a vector of `u8` to get a utf8 `String`.
-    /// This will return `None` if the vector is not valid utf8.
-    public use fun std::string::try_utf8 as vector.try_to_string;
-
-    /// Allows calling `.to_ascii_string()` on a vector of `u8` to get an `ascii::String`.
-    public use fun std::ascii::string as vector.to_ascii_string;
-
-    /// Allows calling `.try_to_ascii_string()` on a vector of `u8` to get an
-    /// `ascii::String`. This will return `None` if the vector is not valid ascii.
-    public use fun std::ascii::try_string as vector.try_to_ascii_string;
-
     /// The index into the vector is out of bounds
     const EINDEX_OUT_OF_BOUNDS: u64 = 0x20000;
 
@@ -31,7 +17,6 @@ module std::vector {
     /// Return the length of the vector.
     native public fun length<Element>(v: &vector<Element>): u64;
 
-    #[syntax(index)]
     #[bytecode_instruction]
     /// Acquire an immutable reference to the `i`th element of the vector `v`.
     /// Aborts if `i` is out of bounds.
@@ -41,7 +26,6 @@ module std::vector {
     /// Add element `e` to the end of the vector `v`.
     native public fun push_back<Element>(v: &mut vector<Element>, e: Element);
 
-    #[syntax(index)]
     #[bytecode_instruction]
     /// Return a mutable reference to the `i`th element in the vector `v`.
     /// Aborts if `i` is out of bounds.
@@ -64,44 +48,44 @@ module std::vector {
 
     /// Return an vector of size one containing element `e`.
     public fun singleton<Element>(e: Element): vector<Element> {
-        let mut v = empty();
-        v.push_back(e);
+        let v = empty();
+        push_back(&mut v, e);
         v
     }
 
     /// Reverses the order of the elements in the vector `v` in place.
     public fun reverse<Element>(v: &mut vector<Element>) {
-        let len = v.length();
+        let len = length(v);
         if (len == 0) return ();
 
-        let mut front_index = 0;
-        let mut back_index = len -1;
+        let front_index = 0;
+        let back_index = len -1;
         while (front_index < back_index) {
-            v.swap(front_index, back_index);
+            swap(v, front_index, back_index);
             front_index = front_index + 1;
             back_index = back_index - 1;
         }
     }
 
     /// Pushes all of the elements of the `other` vector into the `lhs` vector.
-    public fun append<Element>(lhs: &mut vector<Element>, mut other: vector<Element>) {
-        other.reverse();
-        while (!other.is_empty()) lhs.push_back(other.pop_back());
-        other.destroy_empty();
+    public fun append<Element>(lhs: &mut vector<Element>, other: vector<Element>) {
+        reverse(&mut other);
+        while (!is_empty(&other)) push_back(lhs, pop_back(&mut other));
+        destroy_empty(other);
     }
 
     /// Return `true` if the vector `v` has no elements and `false` otherwise.
     public fun is_empty<Element>(v: &vector<Element>): bool {
-        v.length() == 0
+        length(v) == 0
     }
 
     /// Return true if `e` is in the vector `v`.
     /// Otherwise, returns false.
     public fun contains<Element>(v: &vector<Element>, e: &Element): bool {
-        let mut i = 0;
-        let len = v.length();
+        let i = 0;
+        let len = length(v);
         while (i < len) {
-            if (&v[i] == e) return true;
+            if (borrow(v, i) == e) return true;
             i = i + 1;
         };
         false
@@ -110,10 +94,10 @@ module std::vector {
     /// Return `(true, i)` if `e` is in the vector `v` at index `i`.
     /// Otherwise, returns `(false, 0)`.
     public fun index_of<Element>(v: &vector<Element>, e: &Element): (bool, u64) {
-        let mut i = 0;
-        let len = v.length();
+        let i = 0;
+        let len = length(v);
         while (i < len) {
-            if (&v[i] == e) return (true, i);
+            if (borrow(v, i) == e) return (true, i);
             i = i + 1;
         };
         (false, 0)
@@ -122,29 +106,29 @@ module std::vector {
     /// Remove the `i`th element of the vector `v`, shifting all subsequent elements.
     /// This is O(n) and preserves ordering of elements in the vector.
     /// Aborts if `i` is out of bounds.
-    public fun remove<Element>(v: &mut vector<Element>, mut i: u64): Element {
-        let mut len = v.length();
+    public fun remove<Element>(v: &mut vector<Element>, i: u64): Element {
+        let len = length(v);
         // i out of bounds; abort
         if (i >= len) abort EINDEX_OUT_OF_BOUNDS;
 
         len = len - 1;
-        while (i < len) v.swap(i, { i = i + 1; i });
-        v.pop_back()
+        while (i < len) swap(v, i, { i = i + 1; i });
+        pop_back(v)
     }
 
     /// Insert `e` at position `i` in the vector `v`.
     /// If `i` is in bounds, this shifts the old `v[i]` and all subsequent elements to the right.
-    /// If `i == v.length()`, this adds `e` to the end of the vector.
+    /// If `i == length(v)`, this adds `e` to the end of the vector.
     /// This is O(n) and preserves ordering of elements in the vector.
-    /// Aborts if `i > v.length()`
-    public fun insert<Element>(v: &mut vector<Element>, e: Element, mut i: u64) {
-        let len = v.length();
+    /// Aborts if `i > length(v)`
+    public fun insert<Element>(v: &mut vector<Element>, e: Element, i: u64) {
+        let len = length(v);
         // i too big abort
         if (i > len) abort EINDEX_OUT_OF_BOUNDS;
 
-        v.push_back(e);
+        push_back(v, e);
         while (i < len) {
-            v.swap(i, len);
+            swap(v, i, len);
             i = i + 1
         }
     }
@@ -153,9 +137,9 @@ module std::vector {
     /// This is O(1), but does not preserve ordering of elements in the vector.
     /// Aborts if `i` is out of bounds.
     public fun swap_remove<Element>(v: &mut vector<Element>, i: u64): Element {
-        assert!(!v.is_empty(), EINDEX_OUT_OF_BOUNDS);
-        let last_idx = v.length() - 1;
-        v.swap(i, last_idx);
-        v.pop_back()
+        assert!(!is_empty(v), EINDEX_OUT_OF_BOUNDS);
+        let last_idx = length(v) - 1;
+        swap(v, i, last_idx);
+        pop_back(v)
     }
 }

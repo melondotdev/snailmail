@@ -6,12 +6,15 @@
 /// for the objects to still exist in storage, which may be important for external tools.
 /// The difference is otherwise not observable from within Move.
 module sui::object_bag {
+    use std::option::Option;
+    use sui::object::{Self, ID, UID};
     use sui::dynamic_object_field as ofield;
+    use sui::tx_context::TxContext;
 
     // Attempted to destroy a non-empty bag
     const EBagNotEmpty: u64 = 0;
 
-    public struct ObjectBag has key, store {
+    struct ObjectBag has key, store {
         /// the ID of this bag
         id: UID,
         /// the number of key-value pairs in the bag
@@ -34,7 +37,6 @@ module sui::object_bag {
         bag.size = bag.size + 1;
     }
 
-    #[syntax(index)]
     /// Immutably borrows the value associated with the key in the bag `bag: &ObjectBag`.
     /// Aborts with `sui::dynamic_field::EFieldDoesNotExist` if the bag does not have an entry with
     /// that key `k: K`.
@@ -44,7 +46,6 @@ module sui::object_bag {
         ofield::borrow(&bag.id, k)
     }
 
-    #[syntax(index)]
     /// Mutably borrows the value associated with the key in the bag `bag: &mut ObjectBag`.
     /// Aborts with `sui::dynamic_field::EFieldDoesNotExist` if the bag does not have an entry with
     /// that key `k: K`.
@@ -91,7 +92,7 @@ module sui::object_bag {
     public fun destroy_empty(bag: ObjectBag) {
         let ObjectBag { id, size } = bag;
         assert!(size == 0, EBagNotEmpty);
-        id.delete()
+        object::delete(id)
     }
 
     /// Returns the ID of the object associated with the key if the bag has an entry with key `k: K`
