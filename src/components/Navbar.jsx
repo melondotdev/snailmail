@@ -4,7 +4,7 @@ import Login from "./Auth/Login";
 import UserOptions from "./UserOptions/UserOptions";
 import SuiSymbol from "../assets/sui-symbol.png";
 
-const Navbar = ({ walletData, isLoggedIn, isWalletConnected, setIsEditProfile, setIsMintJobPost, refreshJobPosts }) => {
+const Navbar = ({ walletData, isLoggedIn, isWalletConnected, setIsEditProfile, setIsMintJobPost }) => {
   const formatWalletAddress = (address) => {
     if (!address) return ''; // Return empty string if address is not provided
     const firstFour = address.substring(0, 4); // Extract first four characters
@@ -33,7 +33,7 @@ const Navbar = ({ walletData, isLoggedIn, isWalletConnected, setIsEditProfile, s
                   <p>{formatWalletAddress(walletData?.Address)}</p>
                 </div>
               )}
-              <UserOptions isWalletConnected={isWalletConnected} setIsEditProfile={setIsEditProfile} setIsMintJobPost={setIsMintJobPost} refreshJobPosts={refreshJobPosts} />
+              <UserOptions isWalletConnected={isWalletConnected} setIsEditProfile={setIsEditProfile} setIsMintJobPost={setIsMintJobPost} />
             </React.Fragment>
           )
         }

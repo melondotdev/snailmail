@@ -7,10 +7,18 @@ import { NextPage } from 'next';
 
 interface MintJobPostProps {
   setIsMintJobPost: React.Dispatch<React.SetStateAction<boolean>>;
-  refreshJobPosts: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost, refreshJobPosts }) => {
+const categoriesOptions = [
+  "Graphics & Design",
+  "Programming & Tech",
+  "Digital Marketing",
+  "Video & Animation",
+  "Writing & Translation",
+  "Other"
+];
+
+const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost }) => {
   const { wallet } = ethos.useWallet();
   const [nftObjectId, setNftObjectId] = useState<string | undefined>();
   const [formInputs, setFormInputs] = useState({
@@ -19,6 +27,7 @@ const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost, refreshJobP
     discord: '',
     twitter: '',
     name: '',
+    category: categoriesOptions[0],
     description: '',
     reward: '',
     image_url: '',
@@ -42,6 +51,7 @@ const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost, refreshJobP
           transactionBlock.pure(formInputs.discord),
           transactionBlock.pure(formInputs.twitter),
           transactionBlock.pure(formInputs.name),
+          transactionBlock.pure(formInputs.category),
           transactionBlock.pure(formInputs.description),
           transactionBlock.pure(formInputs.reward),
           transactionBlock.pure(formInputs.image_url),
@@ -72,6 +82,7 @@ const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost, refreshJobP
     formInputs.discord, 
     formInputs.twitter, 
     formInputs.name,
+    formInputs.category,
     formInputs.description,
     formInputs.reward,
     formInputs.image_url,
@@ -89,7 +100,11 @@ const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost, refreshJobP
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormInputs(prevState => ({ ...prevState, [name]: value }));
-    refreshJobPosts(true);
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setFormInputs(prevState => ({ ...prevState, category: value }));
   };
   
   return (
@@ -153,16 +168,32 @@ const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost, refreshJobP
             <div className='job-post-info grow basis-2/3'>
               <h1 className='text-lg font-bold mb-4'>Job Post Info</h1>
               <div className='flex flex-col h-full items-stretch'>
-                <div className='flex flex-col grow basis-1/4'>
-                  <p className="form-field mb-1">name</p>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formInputs.name}
-                    onChange={handleInputChange}
-                    placeholder="i.e. Short job name"
-                    className="form-input p-1 bg-black w-full text-xs"
-                  />
+                <div className='flex grow basis-y-1/4 items-stretch'>
+                  <div className='flex flex-col grow basis-1/2 mr-2'>
+                    <p className="form-field mb-1">Title</p>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formInputs.name}
+                      onChange={handleInputChange}
+                      placeholder="i.e. Short job title"
+                      className="form-input p-1 bg-black w-full text-xs"
+                    />
+                  </div>
+                  <div className='flex flex-col grow basis-1/2'>
+                    <p className="form-field mb-1">Category</p>
+                    {/* Category dropdown */}
+                    <select
+                      name="category"
+                      value={formInputs.category}
+                      onChange={handleCategoryChange}
+                      className="form-input p-1 bg-black w-full text-xs"
+                    >
+                      {categoriesOptions.map((option, index) => (
+                        <option key={index} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div className='flex flex-col grow basis-1/2 text-wrap'>
                   <p className="form-field mb-1">Description</p>

@@ -16,6 +16,7 @@ module lancer::job_post {
     discord: Url,
     twitter: Url,
     name: String,
+    category: String,
     description: String,
     reward: String,
     image_url: Url,
@@ -61,6 +62,11 @@ module lancer::job_post {
   public fun name(nft: &JobPostNFT): &String {
     &nft.name
   }
+
+  // Get category
+  public fun category(nft: &JobPostNFT): &String {
+    &nft.category
+  }
   
   // Get description
   public fun description(nft: &JobPostNFT): &String {
@@ -85,6 +91,7 @@ module lancer::job_post {
       utf8(b"discord"),
       utf8(b"twitter"),
       utf8(b"name"),
+      utf8(b"category"),
       utf8(b"description"),
       utf8(b"reward"),
       utf8(b"image_url"),
@@ -96,6 +103,7 @@ module lancer::job_post {
       utf8(b"{discord}"),
       utf8(b"{twitter}"),
       utf8(b"{name}"),
+      utf8(b"{category}"),
       utf8(b"{description}"),
       utf8(b"{reward}"),
       utf8(b"{image_url}"),
@@ -125,6 +133,7 @@ module lancer::job_post {
     discord: vector<u8>,
     twitter: vector<u8>,
     name: vector<u8>,
+    category: vector<u8>,
     description: vector<u8>,
     reward: vector<u8>,
     image_url: vector<u8>,
@@ -137,6 +146,7 @@ module lancer::job_post {
       discord: url::new_unsafe_from_bytes(discord),
       twitter: url::new_unsafe_from_bytes(twitter),
       name: utf8(name),
+      category: utf8(category),
       description: utf8(description),
       reward: utf8(reward),
       image_url: url::new_unsafe_from_bytes(image_url),
@@ -147,7 +157,7 @@ module lancer::job_post {
       creator: tx_context::sender(ctx),
       name: nft.name,
     });
-
+    
     transfer::transfer(nft, tx_context::sender(ctx));
   }
   
@@ -165,6 +175,7 @@ module lancer::job_post {
     new_discord: vector<u8>,
     new_twitter: vector<u8>,
     new_name: vector<u8>,
+    new_category: vector<u8>,
     new_description: vector<u8>,
     new_reward: vector<u8>,
     new_image_url: vector<u8>,
@@ -174,6 +185,7 @@ module lancer::job_post {
     nft.discord = url::new_unsafe_from_bytes(new_discord);
     nft.twitter = url::new_unsafe_from_bytes(new_twitter);
     nft.name = utf8(new_name);
+    nft.category = utf8(new_category);
     nft.description = utf8(new_description);
     nft.reward = utf8(new_reward);
     nft.image_url = url::new_unsafe_from_bytes(new_image_url);
@@ -181,7 +193,7 @@ module lancer::job_post {
   
   /// Permanently delete nft
   public entry fun burn(nft: JobPostNFT, _: &mut TxContext) {
-    let JobPostNFT { id, company: _, email: _, discord: _, twitter: _, name: _, description: _, reward: _, image_url: _ } = nft;
+    let JobPostNFT { id, company: _, email: _, discord: _, twitter: _, name: _, category: _, description: _, reward: _, image_url: _ } = nft;
     object::delete(id);
   }
 }

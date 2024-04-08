@@ -3,7 +3,7 @@ import Filter from "./Filter";
 import Post from "./Post";
 import fetchJobPostData from './fetchJobPostData';
 
-const Gallery = ({ userData, isLoggedIn, jobPosts, refreshJobPosts }) => {
+const Gallery = ({ userData, isLoggedIn }) => {
   
   // ===== Set correct size for job posts =====
   
@@ -24,8 +24,8 @@ const Gallery = ({ userData, isLoggedIn, jobPosts, refreshJobPosts }) => {
   const numItemsFitMaxWidth = Math.floor(windowWidth / 250);
   const dynamicItemWidth =
     windowWidth / numItemsFitMaxWidth > 251
-      ? windowWidth / (numItemsFitMaxWidth + 1) - 5
-      : windowWidth / numItemsFitMaxWidth - 5;
+      ? windowWidth / (numItemsFitMaxWidth + 1) - 8
+      : windowWidth / numItemsFitMaxWidth - 8;
 
   // ===== Get Job Postings =====
 
@@ -123,6 +123,7 @@ const Gallery = ({ userData, isLoggedIn, jobPosts, refreshJobPosts }) => {
     const fetchData = async () => {
       try {
         const data = await fetchJobPostData();
+        console.log(data);
         
         const processData = (dataArray) => {
           return dataArray.flat().map((item) => {
@@ -152,51 +153,23 @@ const Gallery = ({ userData, isLoggedIn, jobPosts, refreshJobPosts }) => {
     
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  
-  useEffect(() => {
-    if (jobPostings) {
-      const fetchData = async () => {
-        try {
-          const data = await fetchJobPostData();
-          
-          const processData = (dataArray) => {
-            return dataArray.flat().map((item) => {
-              if (item.data && item.data.object) {
-                const displayData = item.data.object.display;
-                const processedData = {};
-                displayData.forEach((displayItem) => {
-                  processedData[displayItem.key] = displayItem.value;
-                });
-                return processedData;
-              } else {
-                return null; // or handle it according to your application's logic
-              }
-            }).filter(item => item !== null); // Filter out null items if necessary
-          };
-          
-          const processedData = await processData(data);
-          
-          // Append new job postings to existing ones
-          const updatedJobPostings = [...jobPostings, ...processedData];
-          
-          setJobPostings(updatedJobPostings);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-      
-      fetchData();
-      refreshJobPosts(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);  
+  }, []); 
+
+  // ===== Filter for selected categories =====
+
+  // State for selected category
+  const [selectedCategory, setSelectedCategory] = useState('');
+
+  // Filtered job postings based on selected category
+  const filteredJobPostings = selectedCategory
+    ? jobPostings.filter(post => post.category === selectedCategory)
+    : jobPostings;
   
   return (
     <div className="gallery justify-items-center">
       <div className="gallery-container flex flex-wrap">
-        <Filter jobPostings={jobPostings} width={dynamicItemWidth} />
-        {jobPostings.map((jobPosting) => (
+        <Filter jobPostings={jobPostings} width={dynamicItemWidth} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+        {filteredJobPostings.map((jobPosting) => (
           <Post
             key={jobPosting.id}
             isLoggedIn={isLoggedIn}

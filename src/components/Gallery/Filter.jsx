@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import SuiLogo from "../../assets/sui-symbol.png";
 import CalendarSymbol from "../../assets/calendar-white.png";
 
-const Filter = ({ jobPostings, width }) => {
+const Filter = ({ jobPostings, width, selectedCategory, setSelectedCategory }) => {
   const uniqueCategories = [...new Set(jobPostings.map((post) => post.category))];
   
   const jobPostingCounts = uniqueCategories.map((category) => ({
@@ -22,17 +22,26 @@ const Filter = ({ jobPostings, width }) => {
   };
   
   const handleResetToggle = () => {
+    setSelectedCategory('');
     setRewardsSymbol("SUI");
     setSortOption("DATE");
+  };
+
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
   };
   
   return (
     <div className="filter m-0.5 font-inter aspect-square flex flex-col justify-between rounded-3xl py-3 px-1.5 bg-gray-800" style={{ width: `${width}px` }}>
       <div className="filter-item-container flex flex-col items-center">
       {jobPostingCounts.map(({ category, len }) => (
-        <div className="filter-item flex justify-between items-center w-full max-h-28 rounded-2xl bg-gray-700 mb-1" key={category}>
-          <p className="filter-text ml-3 text-faded text-xs">{category?.toUpperCase()}</p>
-          <p className="filter-quantity text-gray-400 mr-3 text-sm">{len}</p>
+        <div 
+          className={`filter-item flex justify-between items-center w-full max-h-28 rounded-2xl ${selectedCategory === category ? 'bg-ssblue' : 'bg-gray-700'} mb-1 ease-in-out duration-300 hover:bg-gray-800 hover:cursor-pointer`}
+          key={category}
+          onClick={() => handleCategoryClick(category)} 
+        >
+          <p className={`filter-text ml-3 ${selectedCategory === category ? 'text-black' : 'text-faded'} text-xs ease-in-out duration-300`}>{category?.toUpperCase()}</p>
+          <p className={`filter-quantity ${selectedCategory === category ? 'text-black' : 'text-gray-400'} mr-3 text-sm ease-in-out duration-300`}>{len}</p>
         </div>
       ))}
       </div>
@@ -53,7 +62,7 @@ const Filter = ({ jobPostings, width }) => {
             aA
           </div>
         </div>
-        <div className="flex items-center justify-around w-24 h-7 bg-slate-900 rounded-2xl cursor-pointer text-faded font-bold duration-30 text-xs hover:bg-gray-800" onClick={handleResetToggle}>
+        <div className="flex items-center justify-around w-24 h-7 bg-slate-900 rounded-2xl cursor-pointer text-faded font-bold ease-in-out duration-300 text-xs hover:bg-gray-800" onClick={handleResetToggle}>
           RESET
         </div>
       </div>
