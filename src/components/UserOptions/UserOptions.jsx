@@ -5,7 +5,7 @@ import Profile from './Profile';
 import ConnectWallet from './ConnectWallet';
 import CreateJobPost from './CreateJobPost';
 
-const UserOptions = ({ isWalletConnected, setIsEditProfile, setIsMintJobPost }) => {
+const UserOptions = ({ isWalletConnected, setIsEditProfile, setIsMintJobPost, refreshJobPosts }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const handleMenuClick = () => {
@@ -27,7 +27,7 @@ const UserOptions = ({ isWalletConnected, setIsEditProfile, setIsMintJobPost }) 
             <Profile setIsEditProfile={setIsEditProfile} setIsMenuOpen={setIsMenuOpen} />
             <ConnectWallet setIsMenuOpen={setIsMenuOpen} />
             {isWalletConnected && (
-              <CreateJobPost setIsMintJobPost={setIsMintJobPost} setIsMenuOpen={setIsMenuOpen} />
+              <CreateJobPost setIsMintJobPost={setIsMintJobPost} setIsMenuOpen={setIsMenuOpen} refreshJobPosts={refreshJobPosts}/>
             )}
             <Signout />
           </div>

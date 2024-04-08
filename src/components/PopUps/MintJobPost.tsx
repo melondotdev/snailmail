@@ -7,9 +7,10 @@ import { NextPage } from 'next';
 
 interface MintJobPostProps {
   setIsMintJobPost: React.Dispatch<React.SetStateAction<boolean>>;
+  refreshJobPosts: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost }) => {
+const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost, refreshJobPosts }) => {
   const { wallet } = ethos.useWallet();
   const [nftObjectId, setNftObjectId] = useState<string | undefined>();
   const [formInputs, setFormInputs] = useState({
@@ -88,6 +89,7 @@ const MintJobPost: NextPage<MintJobPostProps> = ({ setIsMintJobPost }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormInputs(prevState => ({ ...prevState, [name]: value }));
+    refreshJobPosts(true);
   };
   
   return (

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Filter from "./Filter";
 import Post from "./Post";
-import fetchJobPostData from './fetchJobPostData1';
+import fetchJobPostData from './fetchJobPostData';
 
-const Gallery = ({ userData, isLoggedIn }) => {
+const Gallery = ({ userData, isLoggedIn, jobPosts, refreshJobPosts }) => {
   
   // ===== Set correct size for job posts =====
-
+  
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
   useEffect(() => {
@@ -156,6 +156,47 @@ const Gallery = ({ userData, isLoggedIn }) => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (jobPosts) {
+      const fetchData = async () => {
+        try {
+          const data = await fetchJobPostData();
+          
+          const processData = (dataArray) => {
+            return dataArray.flat().map((item) => {
+              if (item.data && item.data.object) {
+                const displayData = item.data.object.display;
+                const processedData = {};
+                displayData.forEach((displayItem) => {
+                  processedData[displayItem.key] = displayItem.value;
+                });
+                return processedData;
+              } else {
+                return null; // or handle it according to your application's logic
+              }
+            }).filter(item => item !== null); // Filter out null items if necessary
+          };
+          
+          const processedData = await processData(data);
+          
+          // Filter out items already in jobPostings based on id
+          const newJobPostings = processedData.filter(newItem => !jobPostings.some(existingItem => existingItem.id === newItem.id));
+          
+          // Append new job postings to existing ones
+          const updatedJobPostings = [...jobPostings, ...newJobPostings];
+          
+          setJobPostings(updatedJobPostings);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      
+      fetchData();
+      refreshJobPosts(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobPosts]);  
   
   return (
     <div className="gallery justify-items-center">

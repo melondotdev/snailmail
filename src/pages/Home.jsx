@@ -22,6 +22,7 @@ const Home = () => {
   const [walletData, setWalletData] = useState({});
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [isMintJobPost, setIsMintJobPost] = useState(false);
+  const [jobPosts, refreshJobPosts] = useState(false);
   
   // Fetch Data from Firebase (note: security rules limit reading to user's own documents)
   
@@ -141,8 +142,8 @@ const Home = () => {
   
   return (
     <div className='home w-screen h-screen font-anton bg-cover bg-top bg-no-repeat bg-darkblue'>
-      <Navbar isLoggedIn={isLoggedIn} walletData={walletData} isWalletConnected={isWalletConnected} setIsEditProfile={setIsEditProfile} setIsMintJobPost={setIsMintJobPost} />
-      <Gallery isLoggedIn={isLoggedIn} userData={userData} />
+      <Navbar isLoggedIn={isLoggedIn} walletData={walletData} isWalletConnected={isWalletConnected} setIsEditProfile={setIsEditProfile} setIsMintJobPost={setIsMintJobPost} refreshJobPosts={refreshJobPosts} />
+      <Gallery isLoggedIn={isLoggedIn} userData={userData} jobPosts={jobPosts} refreshJobPosts={refreshJobPosts}/>
       {isEditProfile && (
         <EditProfile 
           userData={userData} 
