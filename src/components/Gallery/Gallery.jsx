@@ -154,6 +154,7 @@ const Gallery = ({ userData, isLoggedIn }) => {
     };
     
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   return (
