@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Filter from "./Filter";
 import Post from "./Post";
-import fetchJobPostData from './fetchJobPostData';
+import fetchJobPostData from './fetchJobPostData1';
 
 const Gallery = ({ userData, isLoggedIn }) => {
   

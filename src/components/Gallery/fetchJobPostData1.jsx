@@ -22,7 +22,7 @@ const fetchJobPostData = async () => {
     const addresses = jsonData1.data.events.nodes.map((node) => ({
       address: node.json.object_id,
     }));
-
+    
     const fetchedData = [];
 
     for (const addressObj of addresses) {
