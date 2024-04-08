@@ -20,21 +20,21 @@ const Filter = ({ jobPostings, width }) => {
   const handleSortOptionToggle = () => {
     setSortOption(sortOption === "DATE" ? "ALPHABET" : "DATE");
   };
-
+  
   const handleResetToggle = () => {
     setRewardsSymbol("SUI");
     setSortOption("DATE");
   };
-
+  
   return (
     <div className="filter m-0.5 font-inter aspect-square flex flex-col justify-between rounded-3xl py-3 px-1.5 bg-gray-800" style={{ width: `${width}px` }}>
       <div className="filter-item-container flex flex-col items-center">
-        {jobPostingCounts.map(({ category, len }) => (
-          <div className="filter-item flex justify-between items-center w-full max-h-28 rounded-2xl bg-gray-700 mb-1" key={category}>
-            <p className="filter-text ml-3 text-faded text-xs">{category.toUpperCase()}</p>
-            <p className="filter-quantity text-gray-400 mr-3 text-sm">{len}</p>
-          </div>
-        ))}
+      {jobPostingCounts.map(({ category, len }) => (
+        <div className="filter-item flex justify-between items-center w-full max-h-28 rounded-2xl bg-gray-700 mb-1" key={category}>
+          <p className="filter-text ml-3 text-faded text-xs">{category?.toUpperCase()}</p>
+          <p className="filter-quantity text-gray-400 mr-3 text-sm">{len}</p>
+        </div>
+      ))}
       </div>
       <div className="filter-switch flex justify-evenly">
         <div className="switch flex items-center justify-around w-14 h-7 bg-slate-900 rounded-2xl cursor-pointer text-white ease-in-out duration-300 hover:bg-gray-800" onClick={handleRewardsSymbolToggle}>

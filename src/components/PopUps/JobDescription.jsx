@@ -53,14 +53,14 @@ const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsP
           backgroundImage: `url(${imageURL})`
         }}></div>
         <div className="post-info flex items-end">
-          <div className="post-title mt-4 ml-4 text-2xl text-wrap">{jobPosting.title}</div>
+          <div className="post-name mt-4 ml-4 text-2xl text-wrap">{jobPosting.name}</div>
           <div className="post-tags mx-2 flex align-center justify-left flex-wrap">
             <div className="post-tag rounded-3xl px-2 bg-lightgrey text-base text-faded">{jobPosting.category}</div>
           </div>
         </div>
         <div className="info-container flex justify-between">
           <div className="company-info mt-2 mx-4 text-base font-inter flex items-center">
-            {jobPosting.company} • ☆ {jobPosting.companyRating.toFixed(1)} 
+            {jobPosting.company} • ☆ {jobPosting.companyRating?.toFixed(1)} 
             <span className="rating-number opacity-50 ml-1" data-tooltip-id="ratings-tooltip" data-tooltip-content="Reviews">{` (${jobPosting.companyNumberofRatings})`}</span>
             <Tooltip id="ratings-tooltip" />
             <a
@@ -70,13 +70,13 @@ const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsP
               className="email-link ml-2"
             ><MdIcons.MdEmail /></a>
             <a
-              href={jobPosting.discordLink}
+              href={jobPosting.discord}
               target="_blank"
               rel="noopener noreferrer"
               className="discord-link ml-2"
             ><FaIcons.FaDiscord /></a>
             <a
-              href={jobPosting.twitterLink}
+              href={jobPosting.twitter}
               target="_blank"
               rel="noopener noreferrer"
               className="twitter-link ml-2"
@@ -90,7 +90,7 @@ const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsP
         {(isApplied === false) ? (
           <div className="description-action-container h-4/5 flex flex-col justify-evenly">
             <div className="post-description-container relative py-4 mx-4 h-full overflow-y-auto">
-              <h1 className="post-description-title font-inter text-lg font-bold">Job Description</h1>
+              <h1 className="post-description-name font-inter text-lg font-bold">Job Description</h1>
               <div className="post-description text-sm font-inter text-wrap">
                 {jobPosting.description.split('\n').map((line, index) => (
                   <React.Fragment key={index}>
@@ -121,7 +121,7 @@ const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsP
         ) : (
           <div className="description-action-container h-4/5">
             <div className="post-description-container relative font-inter text-sm mt-4 mx-4 h-full">
-              <h1 className="post-description-title font-inter text-lg font-bold mb-2">Application Form</h1>
+              <h1 className="post-description-name font-inter text-lg font-bold mb-2">Application Form</h1>
               <form className="form-container flex flex-col h-5/6 justify-between">
                 <div className="inputs flex flex-col text-white h-full text-wrap break-words">
                   <div>Name: {userData.docs[0].data().name}</div>

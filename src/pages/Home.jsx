@@ -13,7 +13,6 @@ import EditProfile from "../components/PopUps/EditProfile";
 import MintJobPost from '../components/PopUps/MintJobPost.tsx';
 import fetchUserData from '../components/Auth/FetchUserData.jsx';
 import fetchWalletData from '../components/Auth/FetchWalletData.jsx';
-import FetchJobPostAddresses from '../components/Gallery/FetchJobPostAddresses.jsx';
 
 const Home = () => {  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -155,7 +154,6 @@ const Home = () => {
       {isMintJobPost && (
         <MintJobPost setIsMintJobPost={setIsMintJobPost} />
       )}
-      <FetchJobPostAddresses />
     </div>
   )
 }

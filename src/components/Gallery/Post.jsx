@@ -46,14 +46,14 @@ const Post = ({ jobPosting, isLoggedIn, width, userData }) => {
       <div
         className="post-background absolute bg-cover bg-center top-0 left-0 w-full h-full rounded-3xl"
         style={{
-          backgroundImage: `url(${jobPosting.imageURL})`,
+          backgroundImage: `url(${jobPosting.image_url})`,
           filter: isHovered ? "brightness(50%)" : "brightness(100%)",
         }}
       ></div>
       {isHovered && (
         <div className="post-content absolute z-10 top-0 left-0 w-full h-full flex flex-col justify-center items-center text-white cursor-pointer" onClick={handlePostClick}>
           {/* Content you want to show on hover */}
-          <div className="post-title text-2xl text-center">{jobPosting.title}</div>
+          <div className="post-name text-2xl text-center">{jobPosting.name}</div>
           <div className="post-company text-lg text-faded">By: {jobPosting.company}</div>
           <div className="post-tags pt-1 flex align-center justify-center flex-wrap">
             <div className="post-tag rounded-3xl m-0.5 px-3 bg-lightgrey text-base text-faded">{jobPosting.category}</div>
