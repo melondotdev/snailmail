@@ -6,8 +6,8 @@ function App() {
   return (
     <EthosConnectProvider
       ethosConfiguration={{
-        chain: "sui:devnet",
-        network: "https://fullnode.testnet.sui.io/",
+        chain: "sui:mainnet",
+        network: "https://fullnode.mainnet.sui.io/",
         hideEmailSignIn: true
       }}
     >
