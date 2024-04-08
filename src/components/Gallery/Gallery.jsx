@@ -140,21 +140,9 @@ const Gallery = ({ userData, isLoggedIn, jobPosts, refreshJobPosts }) => {
         };
         
         const processedData = await processData(data);
-
-        // Filter out items already in jobPostings based on at least one different field
-        const newJobPostings = processedData.filter(newItem => {
-          // Check if there is an existing job posting with any differing field
-          const existingItem = jobPostings.find(item => {
-            // Check every field and return true if at least one is different
-            return Object.keys(newItem).some(key => newItem[key] !== item[key]);
-          });
-          
-          // If there is no existing item with any differing field, consider it as a new job posting
-          return !existingItem;
-        });
-          
+        
         // Append new job postings to existing ones
-        const updatedJobPostings = [...jobPostings, ...newJobPostings];
+        const updatedJobPostings = [...jobPostings, ...processedData];
         
         setJobPostings(updatedJobPostings);
       } catch (error) {
@@ -165,53 +153,6 @@ const Gallery = ({ userData, isLoggedIn, jobPosts, refreshJobPosts }) => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchJobPostData();
-        
-        const processData = (dataArray) => {
-          return dataArray.flat().map((item) => {
-            if (item.data && item.data.object) {
-              const displayData = item.data.object.display;
-              const processedData = {};
-              displayData.forEach((displayItem) => {
-                processedData[displayItem.key] = displayItem.value;
-              });
-              return processedData;
-            } else {
-              return null; // or handle it according to your application's logic
-            }
-          }).filter(item => item !== null); // Filter out null items if necessary
-        };
-        
-        const processedData = await processData(data);
-        
-        // Filter out items already in jobPostings based on at least one different field
-        const newJobPostings = processedData.filter(newItem => {
-          // Check if there is an existing job posting with any differing field
-          const existingItem = jobPostings.find(item => {
-            // Check every field and return true if at least one is different
-            return Object.keys(newItem).some(key => newItem[key] !== item[key]);
-          });
-          
-          // If there is no existing item with any differing field, consider it as a new job posting
-          return !existingItem;
-        });
-        
-        // Append new job postings to existing ones
-        const updatedJobPostings = [...jobPostings, ...newJobPostings];
-        
-        setJobPostings(updatedJobPostings);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jobPosts]);  
   
   return (
     <div className="gallery justify-items-center">
