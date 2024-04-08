@@ -154,6 +154,44 @@ const Gallery = ({ userData, isLoggedIn, jobPosts, refreshJobPosts }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
+  useEffect(() => {
+    if (jobPostings) {
+      const fetchData = async () => {
+        try {
+          const data = await fetchJobPostData();
+          
+          const processData = (dataArray) => {
+            return dataArray.flat().map((item) => {
+              if (item.data && item.data.object) {
+                const displayData = item.data.object.display;
+                const processedData = {};
+                displayData.forEach((displayItem) => {
+                  processedData[displayItem.key] = displayItem.value;
+                });
+                return processedData;
+              } else {
+                return null; // or handle it according to your application's logic
+              }
+            }).filter(item => item !== null); // Filter out null items if necessary
+          };
+          
+          const processedData = await processData(data);
+          
+          // Append new job postings to existing ones
+          const updatedJobPostings = [...jobPostings, ...processedData];
+          
+          setJobPostings(updatedJobPostings);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      
+      fetchData();
+      refreshJobPosts(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);  
+  
   return (
     <div className="gallery justify-items-center">
       <div className="gallery-container flex flex-wrap">
