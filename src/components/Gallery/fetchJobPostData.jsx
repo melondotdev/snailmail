@@ -30,7 +30,6 @@ const fetchJobPostData = async (afterCursor = null) => {
       });
       
       const jsonData1 = await response1.json();
-      console.log(jsonData1);
       
       const nodes = jsonData1.data.events.nodes.map((node) => ({
         address: node.json.object_id,
@@ -85,7 +84,7 @@ const fetchJobPostData = async (afterCursor = null) => {
         method: "POST",
         body: JSON.stringify({ query: queryData }),
       });
-
+      
       const jsonData2 = await response2.json();
       fetchedData.push(jsonData2);
     } catch (error) {

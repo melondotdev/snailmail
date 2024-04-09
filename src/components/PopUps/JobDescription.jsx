@@ -2,10 +2,13 @@ import React, { useState } from 'react'
 import { Tooltip } from 'react-tooltip'
 import * as FaIcons from "react-icons/fa";
 import * as MdIcons from "react-icons/md";
+import * as TbIcons from "react-icons/tb";
 import { ethos } from 'ethos-connect';
+import emailjs from '@emailjs/browser';
 
 const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsPopupOpen, isPopupOpen, setIsApplied, isApplied }) => {
   const [isReported, setIsReported] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [reportMessageOpacity, setReportMessageOpacity] = useState(1);
   const [formChanges, setFormChanges] = useState({});
   const imageURL = jobPosting.imageURL;
@@ -16,7 +19,7 @@ const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsP
     setIsApplied(false);
     setIsHovered(false);
   };
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormChanges(prevState => ({ ...prevState, [name]: value }));
@@ -34,7 +37,7 @@ const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsP
     setTimeout(() => {
       setReportMessageOpacity(0); // Fade out the message
     }, 0);
-
+    
     setTimeout(() => {
       setIsReported(false);
     }, 2000)
@@ -43,7 +46,60 @@ const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsP
   const handleBackClick = () => {
     setIsApplied(false);
   };
+  
+  const handleSubmitClick = (e) => {
+    e.preventDefault();
 
+    const templateParams = {
+      company: jobPosting.company,
+      companyEmail: jobPosting.email,
+      title: jobPosting.name,
+      name: userData.docs[0].data().name,
+      email: userData.docs[0].data().email,
+      discord: userData.docs[0].data().discord,
+      twitter: userData.docs[0].data().twitter,
+      portfolio: userData.docs[0].data().portfolio,
+      about: userData.docs[0].data().about,
+      qualification: formChanges.qualification,
+    };
+
+    emailjs.init({
+      publicKey: '6EG3ocdIGacZfBqQu',
+      // Do not allow headless browsers
+      blockHeadless: true,
+      blockList: {
+        // The variable contains the email address
+        watchVariable: 'userEmail',
+      },
+      limitRate: {
+        // Set the limit rate for the application
+        id: 'app',
+        // Allow 1 request per 10s
+        throttle: 10000,
+      },
+    });
+
+    emailjs
+      .send('service_m55i096', 'template_hmoaaxu', templateParams).then(
+        (response) => {
+          console.log('SUCCESS!', response.status, response.text);
+        },
+        (error) => {
+          console.log('FAILED...', error);
+        },
+      );
+
+    setIsSubmitted(true);
+        
+    setTimeout(() => {
+      setReportMessageOpacity(0); // Fade out the message
+    }, 0);
+    
+    setTimeout(() => {
+      setIsSubmitted(false);
+    }, 8000)
+  }
+  
   return (
     <div className="popup fixed top-0 left-0 z-10 w-full h-full">
       <div className="popup-bg fixed w-full h-full bg-lightbox bg-cover z-10" onClick={handlePostClick}></div>
@@ -122,24 +178,28 @@ const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsP
           <div className="description-action-container h-4/5">
             <div className="post-description-container relative font-inter text-sm mt-4 mx-4 h-full">
               <h1 className="post-description-name font-inter text-lg font-bold mb-2">Application Form</h1>
-              <form className="form-container flex flex-col h-5/6 justify-between">
+              <form className="form-container flex flex-col h-5/6 justify-between" onSubmit={handleSubmitClick}>
                 <div className="inputs flex flex-col text-white h-full text-wrap break-words">
-                  <div>Name: {userData.docs[0].data().name}</div>
-                  <div>About: {userData.docs[0].data().about}</div>
-                  <div className='wallet-container'>
-                    <span>Wallet: </span> 
-                    <span>{wallet?.address.slice(0, 40)}{wallet?.address.length > 40 && '...'}</span>
+                  <div className='name-email-wallet-container flex items-center mb-2 text-base'>
+                    {userData.docs[0].data().name} • 
+                    <FaIcons.FaWallet className='ml-2 mr-1' data-tooltip-id="wallet" data-tooltip-content={wallet?.address.slice(0, 40) + (wallet?.address.length > 40 ? '...' : '')} />
+                    <Tooltip id="wallet" />
+                    <MdIcons.MdEmail className='mx-1' data-tooltip-id="email" data-tooltip-content={userData.docs[0].data().email} /> 
+                    <Tooltip id="email" />
+                    <FaIcons.FaDiscord className='mx-1' data-tooltip-id="discord" data-tooltip-content={userData.docs[0].data().discord} />
+                    <Tooltip id="discord" />
+                    <FaIcons.FaTwitter className='mx-1' data-tooltip-id="twitter" data-tooltip-content={userData.docs[0].data().twitter} />
+                    <Tooltip id="twitter" />
+                    <TbIcons.TbWorldWww className='mx-1' data-tooltip-id="portfolio" data-tooltip-content={userData.docs[0].data().portfolio} />
+                    <Tooltip id="portfolio" />
                   </div>
-                  <div>Email: {userData.docs[0].data().email}</div>
-                  <div>Portfolio: {userData.docs[0].data().portfolio}</div>
-                  <div>Discord: {userData.docs[0].data().discord}</div>
-                  <div>Twitter: {userData.docs[0].data().twitter}</div>
+                  <div>About Me: {userData.docs[0].data().about}</div>
                   <textarea
                     name="qualification"
                     value={formChanges.qualification}
                     onChange={handleInputChange}
-                    placeholder="Why are you qualified for this role?"
-                    className="form-textarea mt-4 p-1 h-full bg-black text-black"
+                    placeholder="Input proof of ability and/or proof of work"
+                    className="form-textarea mt-4 p-1 h-full bg-black text-white"
                   ></textarea>
                 </div>
                 <div className="post-actions flex justify-center items-center mt-1">
@@ -155,6 +215,15 @@ const JobDescription = ({ userData, jobPosting, isLoggedIn, setIsHovered, setIsP
             className={`report-response fixed z-20 top-0 left-0 w-full h-full flex items-center justify-center bg-opacity-80 bg-black text-white`} 
             style={{opacity: reportMessageOpacity, transition: 'opacity 3s ease-in-out'}}>
             Thank you for submitting a report!
+          </div>
+        )}
+        {isSubmitted && (
+          <div 
+            className={`apply-response fixed z-20 top-0 left-0 w-full h-full flex items-center justify-center bg-opacity-80 bg-black text-white`} 
+            style={{opacity: reportMessageOpacity, transition: 'opacity 6s ease-in-out'}}
+            onClick={() => {setIsSubmitted(false)}}
+          >
+            Thank you for applying! Someone will be in touch if your application is accepted.
           </div>
         )}
       </div>
