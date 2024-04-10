@@ -129,16 +129,20 @@ const Gallery = ({ userData, isLoggedIn }) => {
           return dataArray.flat().map((item) => {
             if (item.data && item.data.object) {
               const displayData = item.data.object.display;
-              const processedData = {};
-              displayData.forEach((displayItem) => {
-                processedData[displayItem.key] = displayItem.value;
-              });
-              return processedData;
+              if (displayData) {
+                const processedData = {};
+                displayData.forEach((displayItem) => {
+                  processedData[displayItem.key] = displayItem.value;
+                });
+                return processedData;
+              } else {
+                return null; // Handle null case appropriately
+              }
             } else {
               return null; // or handle it according to your application's logic
             }
           }).filter(item => item !== null); // Filter out null items if necessary
-        };
+        };        
         
         const processedData = await processData(data);
         

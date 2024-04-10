@@ -67,7 +67,7 @@ const fetchJobPostData = async (afterCursor = null) => {
   }
 
   const fetchedData = [];
-
+  
   for (const addressObj of addresses) {
     const queryData =
       `query {
