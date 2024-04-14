@@ -81,9 +81,21 @@ const Home = () => {
   
   // ===== Minting Function =====
   
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorLoadingContent, setErrorLoadingContent] = useState(false);
+  
   const mint = useCallback(async () => {
     if (!wallet?.currentAccount) return;
-
+    
+    setIsLoading(true); // Set loading state
+    console.log(blob);
+    
+    if (!blob) {
+      setIsLoading(false);
+      setErrorLoadingContent(true);
+      return;
+    }
+    
     const cid = await pinFiletoIPFS(blob);
     
     try {
@@ -117,6 +129,8 @@ const Home = () => {
       }  
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false); // Reset loading state
     }
   }, [
     formChanges.message,
@@ -174,22 +188,39 @@ const Home = () => {
                 setIsMinting={setIsMinting}
                 setBlob={setBlob}
               />
-              {/* <div className="absolute inset-0 p-16 break-all text-wrap flex items-center justify-center">
-                <p className={`text-center ${fontSize} ${font} ${fontBold ? 'font-bold' : ''} ${fontItalic ? 'italic' : ''}`} style={{ color: color }}>{formChanges.message}</p>
-              </div> */}
             </div>
           </div>
-          {nftObjectId && (
-            <SuccessMessage reset={reset}>
-              <a 
-                href={`https://suiscan.xyz/mainnet/object/${nftObjectId}`}
-                target="_blank" 
-                rel="noreferrer"
-                className='underline font-blue-600' 
-              >
-                View Your NFT on Sui Scan 
-              </a>
-            </SuccessMessage>
+          {errorLoadingContent && (
+            <div className="popup fixed top-0 left-0 z-10 w-full h-full text-white">
+              <div className="popup-bg fixed w-full h-full bg-lightbox bg-cover z-10" onClick={() => setErrorLoadingContent(false)}>
+                <div className='text-6xl text-center flex h-full justify-center items-center'>
+                  {`Whoops, something went wrong! 
+                  Please try again.`}
+                </div>
+              </div>
+            </div>
+          )}
+          {isLoading ? (
+            <div className="popup fixed top-0 left-0 z-10 w-full h-full text-white">
+              <div className="popup-bg fixed w-full h-full bg-lightbox bg-cover z-10" onClick={() => setIsLoading(false)}>
+                <div className='text-6xl text-center flex h-full justify-center items-center'>Loading...</div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {nftObjectId && (
+                <SuccessMessage reset={reset}>
+                  <a 
+                    href={`https://suiscan.xyz/mainnet/object/${nftObjectId}`}
+                    target="_blank" 
+                    rel="noreferrer"
+                    className='underline font-blue-600' 
+                  >
+                    View Your NFT on Sui Scan 
+                  </a>
+                </SuccessMessage>
+              )}
+            </>
           )}
           <form className='message-constructor basis-1/2 pl-8 flex flex-col pb-20 justify-between' onSubmit={handleSubmit}>
             <div>

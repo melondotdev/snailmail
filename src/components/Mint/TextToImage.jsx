@@ -58,7 +58,7 @@ const TextToImage = ({
       ref={previewRef}
     >
       <img src={mailTemplates[chosenTemplateIndex]} alt={`frame${chosenTemplateIndex + 1}`} className="min-w-96 min-h-96" />
-      <div className="absolute inset-0 p-16 break-all text-wrap flex items-center justify-center">
+      <div className="absolute inset-0 p-16 text-wrap flex items-center justify-center">
         <p className={`text-center ${fontSize} ${font} ${fontBold ? 'font-bold' : ''} ${fontItalic ? 'italic' : ''}`} style={{ color: fontColor }}>{text}</p>
       </div>
     </div>
