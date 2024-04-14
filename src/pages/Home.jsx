@@ -83,6 +83,7 @@ const Home = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   const [errorLoadingContent, setErrorLoadingContent] = useState(false);
+  const [errorMessageOpacity, setErrorMessageOpacity] = useState(1);
   
   const mint = useCallback(async () => {
     if (!wallet?.currentAccount) return;
@@ -92,7 +93,19 @@ const Home = () => {
     
     if (!blob) {
       setIsLoading(false);
+
       setErrorLoadingContent(true);
+      setErrorMessageOpacity(1); // Immediately show the message with full opacity
+  
+      // Begin fade-out after 3 seconds
+      setTimeout(() => {
+        setErrorMessageOpacity(0); // Fade out the message
+      }, 0);
+      
+      setTimeout(() => {
+        setErrorLoadingContent(false);
+      }, 3000)
+      
       return;
     }
     
@@ -109,8 +122,6 @@ const Home = () => {
           transactionBlock.pure(formChanges.address),
         ]
       })
-      
-      console.log(`https://${cid}.ipfs.nft.storage`);
       
       const response = await wallet.signAndExecuteTransactionBlock({
         transactionBlock,
@@ -191,9 +202,12 @@ const Home = () => {
             </div>
           </div>
           {errorLoadingContent && (
-            <div className="popup fixed top-0 left-0 z-10 w-full h-full text-white">
+            <div 
+              className="popup fixed top-0 left-0 z-10 w-full h-full text-white" 
+              style={{opacity: errorMessageOpacity, transition: 'opacity 3s ease-in-out'}}
+            >
               <div className="popup-bg fixed w-full h-full bg-lightbox bg-cover z-10" onClick={() => setErrorLoadingContent(false)}>
-                <div className='text-6xl text-center flex h-full justify-center items-center'>
+                <div className='text-3xl text-center flex h-full justify-center items-center'>
                   {`Whoops, something went wrong! 
                   Please try again.`}
                 </div>
