@@ -1,19 +1,29 @@
 import React from 'react'
 import { SignInButton, ethos, EthosConnectStatus } from 'ethos-connect';
-import * as FaIcons from "react-icons/fa";
 
-const ConnectWallet = ({ setIsMenuOpen, setIsMintJobPost }) => {
+const ConnectWallet = ({ disconnectionRequest, setDisconnectionRequest }) => {
   const { wallet, status } = ethos.useWallet();
   
   return (
-    <div className='flex items-center text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-ssblue hover:text-black'>
-      <FaIcons.FaWallet className='mr-2'/>
+    <div className='relative inline-block text-left mt-2'>
       {!(status === EthosConnectStatus.Connected) ? (
-        <SignInButton onClick={() => { setIsMenuOpen(false) }}>
-          Connect Wallet
+        <SignInButton>
+          <p className='text-2xl px-5 py-0.5 border-2 border-ssblue rounded-3xl hover:bg-ssblue'>Connect</p>
         </SignInButton>
       ) : (
-        <p onClick={() => { wallet.disconnect(); setIsMenuOpen(false); }}>Disconnect Wallet</p>
+        <React.Fragment>
+          {disconnectionRequest && (
+            <div 
+              className="absolute right-0 z-10 mt-8 w-40 origin-top-right border-2 border-ssblue font-sans 
+              text-center rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 
+              ease-in-out duration-300 hover:bg-ssblue cursor-pointer"
+            >
+              <div className="py-0.5" role="none">
+                <p onClick={() => { wallet.disconnect(); setDisconnectionRequest(false); }}>Disconnect Wallet</p>
+              </div>
+            </div>
+          )}
+        </React.Fragment>
       )}
     </div>
   )
