@@ -13,8 +13,6 @@ const TextToImage = ({
   fontBold,
   fontItalic,
   text,
-  isMinting,
-  setIsMinting,
   setBlob,
 }) => {
   const previewRef = useRef(null);
@@ -40,18 +38,15 @@ const TextToImage = ({
           }
           return new Blob([u8arr], {type:mime});
         }
-
+        
         const blob = dataURLtoBlob(imgData);
         
-        if (isMinting) {
-          setBlob(blob);
-          setIsMinting(false);
-        }
+        setBlob(blob);
       });
     };
     
     generateImage();
-  }, [chosenTemplateIndex, fontBold, fontColor, fontItalic, fontSize, isMinting, setIsMinting, mailTemplates, text, setBlob])
+  }, [chosenTemplateIndex, fontBold, fontColor, fontItalic, fontSize, mailTemplates, text, setBlob])
   
   return (
     <div

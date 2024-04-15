@@ -17,7 +17,6 @@ const Home = () => {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [walletData, setWalletData] = useState({});
   const [chosenTemplateIndex, setChosenTemplateIndex] = useState(0);
-  const [isMinting, setIsMinting] = useState(false);
   const [formChanges, setFormChanges] = useState({
     address: '',
     message: ''
@@ -55,7 +54,7 @@ const Home = () => {
     Frame4,
   ];
   const [color, setColor] = useState('black');
-  const [font, setFont] = useState('sans-serif');
+  const [font, setFont] = useState('font-sans');
   const [fontSize, setFontSize] = useState('text-3xl');
   const [fontBold, setFontBold] = useState(false);
   const [fontItalic, setFontItalic] = useState(false);
@@ -80,7 +79,7 @@ const Home = () => {
   };
   
   // ===== Minting Function =====
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [errorLoadingContent, setErrorLoadingContent] = useState(false);
   const [errorMessageOpacity, setErrorMessageOpacity] = useState(1);
@@ -152,7 +151,6 @@ const Home = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsMinting(true);
     mint();
   }
 
@@ -195,8 +193,6 @@ const Home = () => {
                 fontBold={fontBold}
                 fontItalic={fontItalic}
                 text={formChanges.message}
-                isMinting={isMinting}
-                setIsMinting={setIsMinting}
                 setBlob={setBlob}
               />
             </div>
