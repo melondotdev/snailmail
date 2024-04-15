@@ -12,6 +12,8 @@ import Frame1 from '../assets/frame1.png';
 import Frame2 from '../assets/frame2.png';
 import Frame3 from '../assets/frame3.png';
 import Frame4 from '../assets/frame4.png';
+import Frame5 from '../assets/frame5.png';
+import Frame6 from '../assets/frame6.png';
 
 const Home = () => {  
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -53,6 +55,8 @@ const Home = () => {
     Frame2,
     Frame3,
     Frame4,
+    Frame5,
+    Frame6
   ];
   const [color, setColor] = useState('black');
   const [font, setFont] = useState('font-sans');
