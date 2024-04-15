@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { ethos, EthosConnectStatus, TransactionBlock } from 'ethos-connect';
 import { HuePicker } from 'react-color';
-import { SNAILMAIL } from '../lib/constants';
+import { SNAILMAIL, SNAILMAIL_MAINTAINER } from '../lib/constants';
 import { Tooltip } from 'react-tooltip'
 import Navbar from '../components/Navbar';
 import TextToImage from '../components/Mint/TextToImage';
@@ -23,6 +23,7 @@ const Home = () => {
   });
   const [blob, setBlob] = useState('');
   const [nftObjectId, setNftObjectId] = useState('');
+  const { default: BigNumber } = require("bignumber.js");
   
   // Listener for wallet connection status
   const { wallet, status } = ethos.useWallet();
@@ -111,16 +112,27 @@ const Home = () => {
     const cid = await pinFiletoIPFS(blob);
     
     try {
-      const transactionBlock = await new TransactionBlock()
+      const transactionBlock = new TransactionBlock();
+
+      const fee = new BigNumber(20000000);
+      const payment = transactionBlock.splitCoins(
+        transactionBlock.gas,
+        [transactionBlock.pure(fee)]
+      );
+      const coinVec = transactionBlock.makeMoveVec({ objects: [payment] });
+
       await transactionBlock.moveCall({
         target: `${SNAILMAIL}::snailmail::mint_to_recipient`,
+        typeArguments: [],
         arguments: [
+          transactionBlock.object(SNAILMAIL_MAINTAINER),
+          coinVec,
           transactionBlock.pure('Snail Mail'),
           transactionBlock.pure(formChanges.message),
           transactionBlock.pure(`https://${cid}.ipfs.nftstorage.link`),
           transactionBlock.pure(formChanges.address),
         ]
-      })
+      });
       
       const response = await wallet.signAndExecuteTransactionBlock({
         transactionBlock,
@@ -146,7 +158,8 @@ const Home = () => {
     formChanges.message,
     blob,
     formChanges.address,
-    wallet
+    wallet,
+    BigNumber
   ]);
 
   const handleSubmit = (e) => {
@@ -166,8 +179,9 @@ const Home = () => {
     <div className='home w-screen h-screen font-anton bg-cover bg-top text-white bg-no-repeat bg-darkblue overflow-y-auto'>
       <Navbar walletData={walletData} isWalletConnected={isWalletConnected} />
       <div className='w-screen flex flex-col items-center'>
-        <h1 className='text-4xl text-center mt-16 mb-4' >Send Customized On-Chain Messages!</h1>
-        <div className='p-4 border-y-2 opacity-70 mx-48 italic'>
+        <h1 className='text-4xl text-center mt-16' >Send Customized On-Chain Messages!</h1>
+        <p className='font-sans text-xl text-center italic opacity-70 mb-4'>(Costs 0.02 Sui per Message + 0.004 Sui Minting Fee)</p>
+        <div className='p-4 border-y-2 opacity-90 mx-48 italic'>
           <p className='font-sans text-xl text-center'>Appropriate for: personalized greetings, connection requests, birthday cards</p>
           <p className='font-sans text-xl text-center'>Inappropriate for: love confessions, slam poetry, cooking recipes</p>
         </div>

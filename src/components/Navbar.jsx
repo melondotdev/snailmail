@@ -34,7 +34,6 @@ const Navbar = ({ walletData, isWalletConnected }) => {
             <span className="text-white">SUI</span>
             <span className="text-ssblue">SNAILS</span>
             <span className="text-white ml-2">SNAILMAIL</span>
-            <span className="text-yellow-300 ml-2">{`[BETA v1.0]`}</span>
           </div>
         </Link>
       </div>
