@@ -6,11 +6,11 @@ import * as IoIcons from "react-icons/io5";
 
 const Navbar = ({ walletData, isWalletConnected }) => {
   const [disconnectionRequest, setDisconnectionRequest] = useState(false);
-
+  
   const handleDisconnect = () => {
     setDisconnectionRequest(!disconnectionRequest);
   }
-
+  
   const formatWalletAddress = (address) => {
     if (!address) return ''; // Return empty string if address is not provided
     const firstFour = address.substring(0, 4); // Extract first four characters
@@ -31,9 +31,8 @@ const Navbar = ({ walletData, isWalletConnected }) => {
         </a>
         <Link to="/">
           <div className="navbar-left flex items-center ml-4 text-3xl">
-            <span className="text-white">SUI</span>
-            <span className="text-ssblue">SNAILS</span>
-            <span className="text-white ml-2">SNAILMAIL</span>
+            <span className="text-white">SNAIL</span>
+            <span className="text-ssblue">MAIL</span>
           </div>
         </Link>
       </div>

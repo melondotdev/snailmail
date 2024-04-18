@@ -1,15 +1,18 @@
 import React from 'react'
-import { SignInButton, ethos, EthosConnectStatus } from 'ethos-connect';
+import { ConnectButton, useCurrentWallet, useDisconnectWallet } from '@mysten/dapp-kit';
+// import { SignInButton, ethos, EthosConnectStatus } from 'ethos-connect';
 
 const ConnectWallet = ({ disconnectionRequest, setDisconnectionRequest }) => {
-  const { wallet, status } = ethos.useWallet();
+  // const { wallet, status } = ethos.useWallet();
+  const { connectionStatus } = useCurrentWallet();
+  const { mutate: disconnect } = useDisconnectWallet();
   
   return (
     <div className='relative inline-block text-left mt-2'>
-      {!(status === EthosConnectStatus.Connected) ? (
-        <SignInButton>
-          <p className='text-2xl px-5 py-0.5 border-2 border-ssblue rounded-3xl hover:bg-ssblue'>Connect</p>
-        </SignInButton>
+      {connectionStatus === 'disconnected' ? (
+        <ConnectButton>
+          Connect
+        </ConnectButton>
       ) : (
         <React.Fragment>
           {disconnectionRequest && (
@@ -19,7 +22,7 @@ const ConnectWallet = ({ disconnectionRequest, setDisconnectionRequest }) => {
               ease-in-out duration-300 hover:bg-ssblue cursor-pointer"
             >
               <div className="py-0.5" role="none">
-                <p onClick={() => { wallet.disconnect(); setDisconnectionRequest(false); }}>Disconnect Wallet</p>
+                <p onClick={() => { disconnect(); setDisconnectionRequest(false); }}>Disconnect Wallet</p>
               </div>
             </div>
           )}
