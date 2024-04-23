@@ -29,7 +29,7 @@ const Home = () => {
   // ===== Media Queries =====
   
   const isMobile = useMediaQuery({ query: '(max-width: 900px)' });
-  
+
   // Listener for wallet connection status
   
   const { currentWallet, connectionStatus } = useCurrentWallet();

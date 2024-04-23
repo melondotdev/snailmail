@@ -2,7 +2,7 @@ module suisnails::snailmail {
   use sui::url::{Self, Url};
   use std::vector;
   use std::string:: {utf8, String};
-  
+
   use sui::object::{Self, ID, UID};
   use sui::tx_context::{Self, TxContext, sender};
   use sui::event;
