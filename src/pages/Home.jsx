@@ -134,7 +134,7 @@ const Home = () => {
     
     try {
       const transactionBlock = new TransactionBlock();
-
+      
       const fee = 20000000;
       const payment = transactionBlock.splitCoins(
         transactionBlock.gas,
@@ -150,7 +150,7 @@ const Home = () => {
           coinVec,
           transactionBlock.pure('Snail Mail'),
           transactionBlock.pure(formChanges.message),
-          transactionBlock.pure(`https://${cid}.ipfs.nftstorage.link`),
+          transactionBlock.pure(`${cid}`),
           transactionBlock.pure(formChanges.address),
         ]
       });

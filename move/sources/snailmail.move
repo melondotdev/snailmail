@@ -6,7 +6,7 @@ module suisnails::snailmail {
   use sui::object::{Self, ID, UID};
   use sui::tx_context::{Self, TxContext, sender};
   use sui::event;
-
+  
   use sui::sui::SUI;
   use sui::balance::{Self, Balance};
   use sui::coin::{Self, Coin};
@@ -93,7 +93,7 @@ module suisnails::snailmail {
     
     // Commit first version of `Display` to apply changes.
     display::update_version(&mut display);
-
+    
     let maintainer = SnailMailNFTMaintainer {
       id: object::new(ctx),
       maintainer_address: sender(ctx),
@@ -120,7 +120,7 @@ module suisnails::snailmail {
     ctx: &mut TxContext
   ) {
     let (paid, remainder) = merge_and_split(fee, maintainer.fee, ctx);
-
+    
     coin::put(&mut maintainer.balance, paid);
     transfer::public_transfer(remainder, tx_context::sender(ctx));
     
@@ -169,7 +169,7 @@ module suisnails::snailmail {
     assert!(tx_context::sender(ctx) == maintainer.maintainer_address, ENotMaintainer);
     maintainer.maintainer_address = new_maintainer;
   }
-
+  
   public entry fun change_fee(maintainer: &mut SnailMailNFTMaintainer, new_fee: u64, ctx: &mut TxContext) {
     assert!(tx_context::sender(ctx) == maintainer.maintainer_address, ENotMaintainer);
     maintainer.fee = new_fee;

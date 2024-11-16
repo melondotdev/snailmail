@@ -1,13 +1,18 @@
-import { NFTStorage } from 'nft.storage'
-
-const NFT_STORAGE_KEY = process.env.REACT_APP_SNAILMAIL_NFTSTORAGE_API_KEY;
+import { pinata } from '../../utils/config';
 
 const pinFileToIPFS = async (blob) => {
-  const file = await new Blob([blob]);
-  
-  const nftstorage = new NFTStorage({ token: NFT_STORAGE_KEY });
-  
-  return await nftstorage.storeBlob(file);
-}
+  try {
+    // Upload file to Pinata
+    const upload = await pinata.upload.file(blob);
+
+    // Convert the IPFS hash to a gateway URL
+    const ipfsUrl = await pinata.gateways.convert(upload.IpfsHash);
+    
+    return ipfsUrl;
+  } catch (error) {
+    console.error('Error uploading file to Pinata:', error);
+    throw new Error('Failed to upload file to Pinata');
+  }
+};
 
 export default pinFileToIPFS;
